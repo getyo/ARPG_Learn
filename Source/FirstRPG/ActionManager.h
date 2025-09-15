@@ -31,8 +31,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TMap<FString, int32> ActionName2Num;
 
-    // 将 ActionGraph 的类型从 TArray<TArray<bool>> 改为 TArray<TArray<uint8>>
-    // Unreal Engine 不支持 TArray<bool> 作为 TArray 的值类型
+  
     UPROPERTY(VisibleAnywhere)
     TArray<FActionGraphRow> ActionGraph;
 	UFUNCTION(BlueprintCallable)
