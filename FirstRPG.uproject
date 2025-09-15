@@ -3,13 +3,17 @@
 	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
+	"Modules": [
+		{
+			"Name": "FirstRPG",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
 	"Plugins": [
 		{
 			"Name": "ModelingToolsEditorMode",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
+			"Enabled": true
 		},
 		{
 			"Name": "ElectronicNodes",
@@ -18,6 +22,10 @@
 		},
 		{
 			"Name": "MotionWarping",
+			"Enabled": true
+		},
+		{
+			"Name": "UNTLink",
 			"Enabled": true
 		}
 	]
