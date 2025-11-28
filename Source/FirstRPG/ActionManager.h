@@ -66,9 +66,12 @@ private:
         return ActionName2Num[ActionName];
     }
 	void ReadActionTable();
+	void PrintActiveAction();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 		
 };
+
+#define OUT_A_CANBEINTBY_B(A,B) (ActionGraph[GetActionNum(B)].Row[GetActionNum(A)])

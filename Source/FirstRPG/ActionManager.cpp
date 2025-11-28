@@ -64,15 +64,22 @@ void UActionManager::ReadActionTable() {
 		}
 		UE_LOG(LogTemp, Error, TEXT("\n"));
 	}
+	UE_LOG(LogTemp, Error, TEXT("Attack can be int by WasHit? %d"), OUT_A_CANBEINTBY_B("Attack", "WasHit"));
 }
 
 
 bool UActionManager::CanExe(const FString &ActionName) {
 	int RequsetAcNum = GetActionNum(ActionName);
+	/*
+	if(!ActionName.Compare("WasHit"))
+		PrintActiveAction();
+	*/
+
 	if (!ActiveActions.Num()) {
 		ActiveActions.Add(RequsetAcNum);
 		return true;
 	}
+
 	bool CanExe = true;
 	for (auto ActiveAcNum : ActiveActions) {
 		CanExe = CanExe && ActionGraph[RequsetAcNum].Row[ActiveAcNum];
@@ -94,3 +101,8 @@ void UActionManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+void UActionManager::PrintActiveAction() {
+	for(auto action :ActiveActions) {
+		UE_LOG(LogTemp, Warning, TEXT("Active Actions: %s"), *ActionNum2Name[action]);
+	}
+}
