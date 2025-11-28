@@ -71,8 +71,9 @@ void UActionManager::ReadActionTable() {
 bool UActionManager::CanExe(const FString &ActionName) {
 	int RequsetAcNum = GetActionNum(ActionName);
 	/*
-	if(!ActionName.Compare("WasHit"))
+	if (!ActionName.Compare("Die")) {
 		PrintActiveAction();
+	}
 	*/
 
 	if (!ActiveActions.Num()) {
