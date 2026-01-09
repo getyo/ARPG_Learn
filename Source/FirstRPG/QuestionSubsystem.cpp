@@ -5,12 +5,13 @@
 
 void UQuestionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+	Super::Initialize(Collection);
 	ReadQuestion();
 }
 
 void UQuestionSubsystem::Deinitialize()
 {
-	
+	Super::Deinitialize();
 }
 
 void UQuestionSubsystem::ReadQuestion()
