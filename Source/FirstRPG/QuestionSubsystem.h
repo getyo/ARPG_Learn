@@ -7,19 +7,40 @@
 #include "QuestionSubsystem.generated.h"
 
 USTRUCT(BlueprintType)
+struct FS_QuestTarget
+{	
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	int StageInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	FString TargetName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	FString TargetDescription;
+};
+
+
+USTRUCT(BlueprintType)
 struct FS_QuestInfo: public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int Stage;
+	TArray<FS_QuestTarget> Targets;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int Category;
+	FString Description;
+};
+
+USTRUCT(BlueprintType)
+struct FS_PlayerHoldTarget
+{	
+	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	FString Discirption;
+	int StageInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool IsActive;
+	FString TargetName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	FString TargetDescription;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	bool IsCompleted;
 };
@@ -35,28 +56,16 @@ public:
 	UFUNCTION(BlueprintCallable,BlueprintPure, Category = "Quest")
 	TArray<FString> GetAllQuestID();
 	
-	UFUNCTION(BlueprintCallable, Category = "Quest")
-	inline void ActiveQuest(const FString& QuestID)
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
+	inline bool HasQuest(const FString& QuestID)
 	{
-		QuestInfos.Find(QuestID)->IsActive = true;
-		ActiveQuests.Add(QuestID);
+		return QuestInfos.Find(QuestID) != nullptr;
 	}
-	UFUNCTION(BlueprintCallable, Category = "Quest")
-	inline void UntrackedQuest(const FString& QuestID)
-	{
-		QuestInfos.Find(QuestID)->IsActive = false;
-		ActiveQuests.Remove(QuestID);
-	}
-	UFUNCTION(BlueprintCallable, Category = "Quest")
-	inline void SetQuestCompleted(const FString& QuestID)
-	{
-		QuestInfos.Find(QuestID)->IsCompleted = true;
-	}
-	inline void SetQuestUnFinished(const FString& QuestID)
-	{
-		QuestInfos.Find(QuestID)->IsCompleted = false;
-	}
-	
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
+	FS_QuestTarget GetNextQeustTarget(const FString& QuestID,int Stage);
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
+	FS_QuestTarget GetQeustTarget(const FString& QuestID,int Stage);
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	UDataTable* DataTableRef;
