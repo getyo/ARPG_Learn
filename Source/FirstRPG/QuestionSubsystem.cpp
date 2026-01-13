@@ -60,6 +60,49 @@ TArray<FString> UQuestionSubsystem::GetAllQuestID()
 	return QuestIDs;
 }
 
+FS_QuestTarget UQuestionSubsystem::GetQeustTarget(const FString& QuestID, int Stage)
+{
+	auto Quest = QuestInfos.Find(QuestID);
+	if (Quest == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,5.f,  
+		FColor::Red,
+		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestID)
+		);
+		return FS_QuestTarget();
+	}
+	for (auto Element : Quest->Targets)
+	{
+		if (Element.StageInt == Stage)
+			return Element;
+	}
+	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
+FString::Printf(TEXT("Class: %s,Cannot find Stage,QuestID:%s,Stage:%d"), *GetClass()->GetName(),*QuestID,Stage)
+	);
+	return FS_QuestTarget();
+}
+
+FS_QuestTarget UQuestionSubsystem::GetNextQeustTarget(const FString& QuestID, int Stage)
+{
+	auto Quest = QuestInfos.Find(QuestID);
+	if (Quest == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,5.f,  
+		FColor::Red,
+		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestID)
+		);
+		return FS_QuestTarget();
+	}
+	for (int i = 0; i < Quest->Targets.Num(); ++i)
+	{
+		if (Quest->Targets[i].StageInt == Stage && (i+1) < Quest->Targets.Num())
+			return Quest->Targets[i+1];
+	}
+	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
+FString::Printf(TEXT("Class: %s,Cannot find Next Stage,QuestID:%s,Stage:%d"), *GetClass()->GetName(),*QuestID,Stage)
+	);
+	return FS_QuestTarget();
+}
 
 
 
