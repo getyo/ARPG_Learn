@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DialogueDataAsset.h"
+#include "FirstRPG/Character//ThirdPersonPlayerController.h"
 #include "DialogueSubsystem.generated.h"
 
 /**
@@ -14,7 +15,7 @@ USTRUCT(BlueprintType)
 struct FInQuestTargetDialogMap
 {
 	GENERATED_BODY()
-	TMap<int,TArray<FDialogueLine>> Map;
+	TMap<int,UDialogueDataAsset*> Map;
 };
 
 UCLASS()
@@ -27,21 +28,23 @@ private:
 	FString CurrentQuest;
 	int CurrentStage;
 	size_t TextIt;
+	AThirdPersonPlayerController* CurrentPlayerController = nullptr;
+	UDialogueDataAsset * CurrentDialogueAsset = nullptr;
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	bool StartDialogue(const FString &QuestID,int Stage);
+	bool StartDialogue(const FString &QuestID, int Stage, AThirdPersonPlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable,Category = "Dialogue")
 	bool EndDialogue();
 	
 	UFUNCTION(BlueprintCallable,Category = "Dialogue")
 	inline FDialogueLine NextDialogue()
 	{
-		return DialogueAssetMap[CurrentQuest].Map[CurrentStage][TextIt++];
+		return CurrentDialogueAsset->DialogueLines[TextIt++];
 	}
 	UFUNCTION(BlueprintCallable,BlueprintPure,Category = "Dialogue")
-	inline bool IsStageDialogueEnd() const
+	bool IsStageDialogueEnd() const
 	{
-		return TextIt >=  DialogueAssetMap[CurrentQuest].Map[CurrentStage].Num()? true : false;
+		return TextIt >=  CurrentDialogueAsset->DialogueLines.Num()? true : false;
 	}
 };

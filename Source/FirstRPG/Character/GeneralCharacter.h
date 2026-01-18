@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagContainer.h"
 #include "GeneralCharacter.generated.h"
 
 UCLASS(Abstract, Blueprintable,BlueprintType)
@@ -33,6 +34,8 @@ public:
 	}
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
 	FString CharacterName = "";
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
+	FGameplayTag TargetTag;
 private:
 	FString CharacterID = "";
 };
