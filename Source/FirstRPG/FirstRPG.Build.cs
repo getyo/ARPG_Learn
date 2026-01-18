@@ -8,7 +8,10 @@ public class FirstRPG : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore","GameplayTags"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
         //PublicSystemLibraries.Add("C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\lib\\x64\\msvcprt.lib");

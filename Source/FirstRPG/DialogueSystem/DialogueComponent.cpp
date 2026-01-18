@@ -2,7 +2,7 @@
 
 
 #include "DialogueComponent.h"
-#include "../GeneralCharacter.h"
+#include "FirstRPG/Character//GeneralCharacter.h"
 
 // Sets default values for this component's properties
 UDialogueComponent::UDialogueComponent()

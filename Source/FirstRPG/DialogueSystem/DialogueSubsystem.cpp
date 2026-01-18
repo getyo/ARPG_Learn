@@ -3,8 +3,14 @@
 
 #include "DialogueSubsystem.h"
 #include "DialogueComponent.h"
+#include "AssetRegistry/AssetData.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "FirstRPG/CharacterManagerSubsystem.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+#include "../QuestSystem/QuestionSubsystem.h"
+#include "../QuestSystem/DialogueCondition.h"
+#include "FirstRPG/Character/CharacterManagerSubsystem.h"
 
 void UDialogueSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -19,7 +25,7 @@ void UDialogueSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	//构建映射
 	for (auto Elem : AssetList)
 	{
-		if (auto * Asset = Cast<UDialogueDataAsset>(Elem.GetAsset()))
+		if (auto Asset = Cast<UDialogueDataAsset>(Elem.GetAsset()))
 		{
 			//是否存在当前任务
 			if (!DialogueAssetMap.Contains(Asset->RelativeQuestID))
@@ -30,7 +36,8 @@ void UDialogueSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			//是否存在当前阶段
 			if (!InQuestTargetDialogMapPtr->Map.Contains(Asset->Stage))
 			{
-				InQuestTargetDialogMapPtr->Map.Add(Asset->Stage,Asset->DialogueLines);
+				InQuestTargetDialogMapPtr->Map.Add(Asset->Stage,Asset);
+				
 			}
 		}
 	}
@@ -41,7 +48,7 @@ void UDialogueSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage)
+bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage, AThirdPersonPlayerController* PlayerController)
 {
 	if (!DialogueAssetMap.Contains(QuestID))
 	{
@@ -63,19 +70,21 @@ bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage)
 	CurrentQuest = QuestID;
 	CurrentStage = Stage;
 	TextIt = 0;
+	CurrentDialogueAsset = InQuestTargetDialogMapPtr->Map[Stage];
+	CurrentPlayerController = PlayerController;
 	
 	auto GI = GetWorld()->GetGameInstance();
-	auto CharacterManager = Cast<UCharacterManagerSubsystem>(GI);
+	auto CharacterManager = GI->GetSubsystem<UCharacterManagerSubsystem>();
 	if (!CharacterManager) return false;
 	TSet<FString> Characters;
 	//把所有相关的Character的InDialogye设置为true
-	for (auto Elem : InQuestTargetDialogMapPtr->Map[Stage])
+	for (auto Elem : CurrentDialogueAsset->DialogueLines)
 	{
-		Characters.Add(Elem.SpeakerID);
+		Characters.Add(Elem.SpeakerName);
 	}
 	for (auto CharacterID : Characters)
 	{
-		if (auto Character = CharacterManager->GetCharacterByID(CharacterID))
+		if (auto Character = CharacterManager->GetCharacterByName(CharacterID))
 		{
 			UDialogueComponent* DialogueComp = Character->FindComponentByClass<UDialogueComponent>();
 			if (DialogueComp)
@@ -91,17 +100,17 @@ bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage)
 bool UDialogueSubsystem::EndDialogue()
 {
 	auto GI = GetWorld()->GetGameInstance();
-	auto CharacterManager = Cast<UCharacterManagerSubsystem>(GI);
+	auto CharacterManager = GI->GetSubsystem<UCharacterManagerSubsystem>();
 	if (!CharacterManager) return false;
 	TSet<FString> Characters;
 	//把所有相关的Character的InDialogye设置为true
-	for (auto Elem : DialogueAssetMap[CurrentQuest].Map[CurrentStage])
+	for (auto Elem : DialogueAssetMap[CurrentQuest].Map[CurrentStage]->DialogueLines)
 	{
-		Characters.Add(Elem.SpeakerID);
+		Characters.Add(Elem.SpeakerName);
 	}
-	for (auto CharacterID : Characters)
+	for (auto CharacterName : Characters)
 	{
-		if (auto Character = CharacterManager->GetCharacterByID(CharacterID))
+		if (auto Character = CharacterManager->GetCharacterByName(CharacterName))
 		{
 			UDialogueComponent* DialogueComp = Character->FindComponentByClass<UDialogueComponent>();
 			if (DialogueComp)
@@ -111,6 +120,19 @@ bool UDialogueSubsystem::EndDialogue()
 		}
 			
 	}
+	//广播对话完成
+	auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
+	QuestSys->BroadcastFinish(FS_QuestTargetData(E_QuestTargetConditionType::Talk,
+		TalkConditionTag,
+		CurrentDialogueAsset->TargetTag,
+		0,
+		CurrentPlayerController,
+		nullptr));
+	
+	//重置部分相关变量
+	CurrentDialogueAsset = nullptr;
+	CurrentPlayerController = nullptr;
+	TextIt = 0;
 	return true;
 }
 

@@ -42,7 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable,Category= "Character Mannger")
 	inline AGeneralCharacter* GetCharacterByID(const FString& ID) const
 	{
-		if (!Name2IDMap.Contains(ID))
+		if (!ID2CharcCharacterMap.Contains(ID))
 		{
 			GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
 				FString::Printf(TEXT("Class : %s, Cannot find Character: ID : %s"),

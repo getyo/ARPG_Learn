@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NativeGameplayTags.h"
+#include "QuestTargetCondition.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "QuestionSubsystem.generated.h"
 
+//任务系统内部的目标结构体
 USTRUCT(BlueprintType)
 struct FS_QuestTarget
 {	
@@ -16,9 +19,15 @@ struct FS_QuestTarget
 	FString TargetName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString TargetDescription;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	//在界面编辑的任务条件
+	TArray<FS_QuestTargetConditionInfo> EditedQuestTargetConditions;
+	//真正执行期间的条件，在任务子系统读入时根据前者生成
+	UPROPERTY()
+	TArray<UQuestTargetCondition*> Conditions;
 };
 
-
+//任务结构
 USTRUCT(BlueprintType)
 struct FS_QuestInfo: public FTableRowBase
 {
@@ -31,6 +40,9 @@ struct FS_QuestInfo: public FTableRowBase
 	FString Description;
 };
 
+
+//玩家持有的目标结构，与任务系统的目标不同在于，玩家持有的目标是为了知道自己的进度
+//而任务系统的目标数组只做查询用处。
 USTRUCT(BlueprintType)
 struct FS_PlayerHoldTarget
 {	
@@ -43,6 +55,18 @@ struct FS_PlayerHoldTarget
 	FString TargetDescription;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	bool IsCompleted;
+};
+
+//玩家控制器持有的，真的的在玩家那里记录游戏任务进度的类型
+USTRUCT(BlueprintType)
+struct FS_PlayerQuestHandler
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	bool IsFinished;
+	//只保存当前进度的目标
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	FS_PlayerHoldTarget CurrentTarget;
 };
 
 
@@ -59,12 +83,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
 	inline bool HasQuest(const FString& QuestID)
 	{
-		return QuestInfos.Find(QuestID) != nullptr;
+		return _QuestInfos.Find(QuestID) != nullptr;
 	}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
 	FS_QuestTarget GetNextQeustTarget(const FString& QuestID,int Stage);
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
 	FS_QuestTarget GetQeustTarget(const FString& QuestID,int Stage);
+	UFUNCTION(BlueprintCallable,Category = "QuestTargetCondition")
+	void BroadcastFinish(FS_QuestTargetData QuestTargetData);
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
@@ -72,8 +98,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest")
 	TArray<FString> ActiveQuests;
 private:
-	TMap<FString,FS_QuestInfo> QuestInfos;
+	TMap<FString,FS_QuestInfo> _QuestInfos;
 	void ReadQuestion();
+	UFUNCTION()
+	void DeliverTargetCheck(const FS_QuestTargetData & QuestTargetData);
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	bool ShouldCreateSubsystem(UObject* Outer) const override{
