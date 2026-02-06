@@ -15,6 +15,6 @@ class FIRSTRPG_API UGlobalQuestTargetMessenger : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintAssignable, Category = "Events")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Quest")
 	FOnQuestTargetFinishedEvent OnQuestTargetFinishedEvent;
 };

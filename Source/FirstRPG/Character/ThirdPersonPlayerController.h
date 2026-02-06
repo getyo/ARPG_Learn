@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable,BlueprintType)
 class FIRSTRPG_API AThirdPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()

@@ -19,7 +19,7 @@ struct FDialogueLine
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	FText DialogueText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	FString SpeakerName;
+	FGameplayTag SpeakerName;
 };
 
 UCLASS(BlueprintType)
@@ -34,6 +34,4 @@ public:
 	FString RelativeQuestID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	int Stage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	FGameplayTag TargetTag;
 };

@@ -7,7 +7,6 @@
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "FirstRPG/Character//ThirdPersonPlayerController.h"
-#include "Misc/TextFilterExpressionEvaluator.h"
 
 void UQuestionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

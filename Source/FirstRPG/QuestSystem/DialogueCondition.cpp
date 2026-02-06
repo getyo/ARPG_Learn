@@ -14,7 +14,10 @@ bool UDialogueCondition::ConditionPassed(const FS_QuestTargetData& QuestTargetDa
 	checkf(QuestTargetData.ActionTag == TalkConditionTag,
 		TEXT("Class: %s,Action tag should be %s"),
 		*GetName(),*TalkConditionTag.GetTag().ToString());
-	if (QuestTargetData.TargetTag == _TargetTag)
+	//因为对话有其特殊性，你的对话资产本身就存在任务阶段+参与对象的信息，
+	//既然能找到这里就必定是正确的节点，保留第二个条件是为了兼容和以防万一
+	if (_TargetTag.ToString().IsEmpty() ||
+		QuestTargetData.TargetTag == _TargetTag )
 		return true;
 	else return false;
 }

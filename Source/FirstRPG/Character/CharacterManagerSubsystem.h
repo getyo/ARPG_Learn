@@ -17,7 +17,7 @@ class FIRSTRPG_API UCharacterManagerSubsystem : public UGameInstanceSubsystem
 private:
 	FCriticalSection IDMutex;
 	TMap<FString,AGeneralCharacter*> ID2CharcCharacterMap;
-	TMap<FString,FString> Name2IDMap;
+	TMap<FGameplayTag,FString> Name2IDMap;
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -26,13 +26,13 @@ public:
 	FString GenerateID(AGeneralCharacter * Character);
 	
 	UFUNCTION(BlueprintCallable,BlueprintPure,Category= "Character Mannger")
-	inline FString GetCharacterID(const FString& CharacterName) const
+	inline FString GetCharacterID(const FGameplayTag& CharacterName) const
 	{
 		if (!Name2IDMap.Contains(CharacterName))
 		{
 			GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
 				FString::Printf(TEXT("Class : %s, Cannot find Character: Name : %s"),
-					*GetClass()->GetName(),*CharacterName));
+					*GetClass()->GetName(),*CharacterName.ToString()));
 			return "";
 		}
 		return Name2IDMap[CharacterName];
@@ -53,7 +53,7 @@ public:
 	}
 	
 	UFUNCTION(BlueprintCallable,Category= "Character Mannger")
-	inline AGeneralCharacter* GetCharacterByName(const FString& CharacterName) const
+	inline AGeneralCharacter* GetCharacterByName(const FGameplayTag& CharacterName) const
 	{
 		auto ID = GetCharacterID(CharacterName);
 		return GetCharacterByID(ID);

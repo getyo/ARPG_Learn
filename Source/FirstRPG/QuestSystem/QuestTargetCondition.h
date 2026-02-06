@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "FirstRPG/Character//GeneralCharacter.h"
 #include "QuestTargetCondition.generated.h"
 
 UENUM(BlueprintType) // 允许在蓝图中使用
@@ -55,8 +54,10 @@ struct FS_QuestTargetData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TargetCnt = 0;
 	//触发事件的角色
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AController * Instigator = nullptr;
 	//用于传递上下文信息，只不过现在没用
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor * Context = nullptr;
 };
 

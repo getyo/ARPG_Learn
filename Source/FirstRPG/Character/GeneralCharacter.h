@@ -32,10 +32,12 @@ public:
 	{
 		return CharacterID;
 	}
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FString CharacterName = "";
+	FGameplayTag CharacterNameTag;
+	//仅作显示用，真正内部使用的是ID和Tag
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FGameplayTag TargetTag;
+	FString DisplayName;
 private:
 	FString CharacterID = "";
 };
