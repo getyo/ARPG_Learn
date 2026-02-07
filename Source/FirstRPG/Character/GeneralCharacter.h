@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
+#include "FirstRPG/QuestSystem/QuestRelativeInterface.h"
 #include "GeneralCharacter.generated.h"
 
 UCLASS(Abstract, Blueprintable,BlueprintType)
-class FIRSTRPG_API AGeneralCharacter : public ACharacter
+class FIRSTRPG_API AGeneralCharacter : public ACharacter ,public IQuestRelativeInterface
 {
 	GENERATED_BODY()
 
@@ -20,7 +21,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual bool IsQuestRelative_Implementation() override;
+	virtual TArray<FString> GetRelativeQuest_Implementation() override;
+	virtual int GetRelativeQuestStage_Implementation(const FString& QuestID) override;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Quest")
+	bool QuestRelative = false;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -32,10 +37,12 @@ public:
 	{
 		return CharacterID;
 	}
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FString CharacterName = "";
+	FGameplayTag CharacterNameTag;
+	//仅作显示用，真正内部使用的是ID和Tag
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FGameplayTag TargetTag;
+	FString DisplayName;
 private:
 	FString CharacterID = "";
 };

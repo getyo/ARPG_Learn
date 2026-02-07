@@ -2,12 +2,15 @@
 
 
 #include "QuestionSubsystem.h"
+
+#include <ThirdParty/ShaderConductor/ShaderConductor/External/DirectXShaderCompiler/include/dxc/DXIL/DxilConstants.h>
+
 #include "QuestTargetCondition.h"
-#include  "GlobalQuestTargetMessenger.h"
+#include "GlobalQuestTargetMessenger.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "FirstRPG/Character//ThirdPersonPlayerController.h"
-#include "Misc/TextFilterExpressionEvaluator.h"
 
 void UQuestionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -139,34 +142,64 @@ FString::Printf(TEXT("Class: %s,Cannot find Next Stage,QuestID:%s,Stage:%d"), *G
 
 void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTargetData)
 {
-	auto PlayerController = Cast<AThirdPersonPlayerController> (QuestTargetData.Instigator);
 	if (PlayerController)
 	{
-		auto ActiveQuest = PlayerController->GetAllActiveQuest();
-		for (auto Quest : ActiveQuest)
+		bool ActiveTag = false;
+		FS_QuestInfo * QuestPtr = nullptr;
+		if (!_QuestInfos.Find(QuestTargetData.QuestID))
 		{
-			auto QuestTargetConditions = GetQeustTarget(Quest.Key,Quest.Value.CurrentTarget.StageInt).Conditions;
-			for (auto Condition : QuestTargetConditions)
+			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
+	FString::Printf(TEXT("Class: %s,Function : %s,Cannot find Quest,QuestID:%s"), 
+				*GetClass()->GetName(),*FString(__FUNCTION__),*QuestTargetData.QuestID));
+			return;
+		}
+		else QuestPtr = &_QuestInfos[QuestTargetData.QuestID];
+		//如果是触发了某个任务的开始条件，则把它加入激活任务
+		bool AllPassed = true;
+		if (!QuestTargetData.Stage)
+		{
+			ActiveTag = true;
+			for (auto &Condition : QuestPtr->Targets[0].Conditions)
 			{
 				if (Condition->GetQuestTargetConditionType() == QuestTargetData.Type)
 				{
-					if (Condition->ConditionPassed(QuestTargetData))
+					if (!Condition->ConditionPassed(QuestTargetData))
 					{
-						if (!PlayerController->GotoNextStage(Quest.Key))
-						{
-							PlayerController->CompleteQuest(Quest.Key);
-						}
+						AllPassed = false;
+						return;
 					}
 				}
+				else AllPassed = Condition->GetPassed() && AllPassed;
+			}
+			if (AllPassed)
+				PlayerController->AddActiveQuest(QuestTargetData.QuestID);
+		}
+		if (ActiveTag) return;
+		//正常的任务推进
+		for (auto &Target : QuestPtr->Targets)
+		{
+			if (Target.StageInt == QuestTargetData.Stage)
+			{
+				for (auto &Condition : Target.Conditions)
+				{
+					if (Condition->GetQuestTargetConditionType() == QuestTargetData.Type)
+					{
+						if (!Condition->ConditionPassed(QuestTargetData))
+						{
+							AllPassed = false;
+							return;
+						}
+					}
+					else AllPassed = Condition->GetPassed() && AllPassed;
+				}
+				if (AllPassed)
+					PlayerController->GotoNextStage(QuestTargetData.QuestID);
 			}
 		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 20.f,FColor::Red,
-			FString::Printf(TEXT("Class: %s, FS_QuestTargetData Instigator cannot cast to ThridPersonPlayerController"),
-			*GetName()));
-		
+		PlayerController = Cast<AThirdPersonPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	}
 
 }

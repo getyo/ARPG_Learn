@@ -9,13 +9,6 @@ AGeneralCharacter::AGeneralCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
-// Sets default values
-AGeneralCharacter::AGeneralCharacter(const FString&CharacterName)
-{
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	this->CharacterName = CharacterName;
-}
 
 // Called when the game starts or when spawned
 void AGeneralCharacter::BeginPlay()
@@ -33,6 +26,21 @@ void AGeneralCharacter::BeginPlay()
 			CharacterID = CharacterSys->GenerateID(this);
 		}
 	}
+}
+
+inline  bool AGeneralCharacter::IsQuestRelative_Implementation()
+{
+	return QuestRelative;
+}
+
+TArray<FString> AGeneralCharacter::GetRelativeQuest_Implementation()
+{
+	return TArray<FString>();
+}
+
+int AGeneralCharacter::GetRelativeQuestStage_Implementation(const FString& QuestID)
+{
+	return -1;
 }
 
 // Called every frame

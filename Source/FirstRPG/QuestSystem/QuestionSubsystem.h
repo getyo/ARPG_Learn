@@ -8,6 +8,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "QuestionSubsystem.generated.h"
 
+class AThirdPersonPlayerController;
 //任务系统内部的目标结构体
 USTRUCT(BlueprintType)
 struct FS_QuestTarget
@@ -93,10 +94,6 @@ public:
 	void BroadcastFinish(FS_QuestTargetData QuestTargetData);
 
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	UDataTable* DataTableRef;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest")
-	TArray<FString> ActiveQuests;
 private:
 	TMap<FString,FS_QuestInfo> _QuestInfos;
 	void ReadQuestion();
@@ -112,4 +109,8 @@ private:
 		}
 		return Super::ShouldCreateSubsystem(Outer);
 	}
+	AThirdPersonPlayerController * PlayerController = nullptr;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	UDataTable* DataTableRef;
 };

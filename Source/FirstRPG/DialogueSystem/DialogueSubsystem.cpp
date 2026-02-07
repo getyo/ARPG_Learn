@@ -76,7 +76,7 @@ bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage, AThird
 	auto GI = GetWorld()->GetGameInstance();
 	auto CharacterManager = GI->GetSubsystem<UCharacterManagerSubsystem>();
 	if (!CharacterManager) return false;
-	TSet<FString> Characters;
+	TSet<FGameplayTag> Characters;
 	//把所有相关的Character的InDialogye设置为true
 	for (auto Elem : CurrentDialogueAsset->DialogueLines)
 	{
@@ -102,7 +102,7 @@ bool UDialogueSubsystem::EndDialogue()
 	auto GI = GetWorld()->GetGameInstance();
 	auto CharacterManager = GI->GetSubsystem<UCharacterManagerSubsystem>();
 	if (!CharacterManager) return false;
-	TSet<FString> Characters;
+	TSet<FGameplayTag> Characters;
 	//把所有相关的Character的InDialogye设置为true
 	for (auto Elem : DialogueAssetMap[CurrentQuest].Map[CurrentStage]->DialogueLines)
 	{
@@ -121,14 +121,19 @@ bool UDialogueSubsystem::EndDialogue()
 			
 	}
 	//广播对话完成
-	auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
-	QuestSys->BroadcastFinish(FS_QuestTargetData(E_QuestTargetConditionType::Talk,
-		TalkConditionTag,
-		CurrentDialogueAsset->TargetTag,
-		0,
-		CurrentPlayerController,
-		nullptr));
-	
+	if (!CurrentDialogueAsset->RelativeQuestID.IsEmpty())
+	{
+		auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
+		QuestSys->BroadcastFinish(FS_QuestTargetData(
+			CurrentDialogueAsset->RelativeQuestID,
+			CurrentStage,
+			E_QuestTargetConditionType::Talk,
+			TalkConditionTag,
+			FGameplayTag(),
+			0,
+			CurrentPlayerController,
+			nullptr));
+	}
 	//重置部分相关变量
 	CurrentDialogueAsset = nullptr;
 	CurrentPlayerController = nullptr;
