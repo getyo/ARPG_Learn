@@ -121,14 +121,19 @@ bool UDialogueSubsystem::EndDialogue()
 			
 	}
 	//广播对话完成
-	auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
-	QuestSys->BroadcastFinish(FS_QuestTargetData(E_QuestTargetConditionType::Talk,
-		TalkConditionTag,
-		FGameplayTag(),
-		0,
-		CurrentPlayerController,
-		nullptr));
-	
+	if (!CurrentDialogueAsset->RelativeQuestID.IsEmpty())
+	{
+		auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
+		QuestSys->BroadcastFinish(FS_QuestTargetData(
+			CurrentDialogueAsset->RelativeQuestID,
+			CurrentStage,
+			E_QuestTargetConditionType::Talk,
+			TalkConditionTag,
+			FGameplayTag(),
+			0,
+			CurrentPlayerController,
+			nullptr));
+	}
 	//重置部分相关变量
 	CurrentDialogueAsset = nullptr;
 	CurrentPlayerController = nullptr;

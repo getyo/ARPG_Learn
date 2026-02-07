@@ -18,10 +18,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Quest")
 	TMap<FString,FS_PlayerQuestHandler> GetAllActiveQuest();
 	
-	UFUNCTION(BlueprintNativeEvent, Category = "Quest")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "Quest")
 	//当进行完最后一个阶段，也就是任务结束以后返回false
 	bool GotoNextStage(const FString &QuestID);
-	UFUNCTION(BlueprintNativeEvent, Category = "Quest")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "Quest")
 	//当进行完最后一个阶段，也就是任务结束以后返回false
 	void CompleteQuest(const FString &QuestID);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "Quest")
+	bool AddActiveQuest(const FString &QuestID);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "Quest")
+	bool IsQuestActive(const FString &QuestID);
 };

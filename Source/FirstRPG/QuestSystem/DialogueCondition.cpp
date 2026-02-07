@@ -18,6 +18,7 @@ bool UDialogueCondition::ConditionPassed(const FS_QuestTargetData& QuestTargetDa
 	//既然能找到这里就必定是正确的节点，保留第二个条件是为了兼容和以防万一
 	if (_TargetTag.ToString().IsEmpty() ||
 		QuestTargetData.TargetTag == _TargetTag )
-		return true;
-	else return false;
+		HasPassed = true;
+	else HasPassed = false;
+	return HasPassed;
 }

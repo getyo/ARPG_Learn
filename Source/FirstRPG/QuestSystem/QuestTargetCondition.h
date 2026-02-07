@@ -40,7 +40,11 @@ USTRUCT(BlueprintType)
 struct FS_QuestTargetData
 {
 	GENERATED_BODY()
-	//前两个目前来说是一样的，因为动作类型目前来讲没有和完成方式区分
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString QuestID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Stage;
+	//以下两个目前来说是一样的，因为动作类型目前来讲没有和完成方式区分
 	//但是之后可能区分，为了未来兼容所以保留了两个成员
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	E_QuestTargetConditionType Type;
@@ -80,10 +84,15 @@ public:
 	{
 		return _Type;
 	}
+	inline bool GetPassed() const
+	{
+		return HasPassed;
+	}
 private:
 	static const TMap<E_QuestTargetConditionType,TSubclassOf<UQuestTargetCondition>>* _E2Class;
 protected:
 	E_QuestTargetConditionType _Type;
+	bool HasPassed = false;
 	virtual void SetDefaultProperties(FGameplayTag TargetTag,int RequestedNum=0,UObject* Outer = nullptr){}
 	
 };

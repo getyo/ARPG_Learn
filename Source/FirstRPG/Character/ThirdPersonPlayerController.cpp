@@ -18,3 +18,13 @@ bool AThirdPersonPlayerController::GotoNextStage_Implementation(const FString& Q
 void AThirdPersonPlayerController::CompleteQuest_Implementation(const FString& QuestID)
 {
 }
+
+bool AThirdPersonPlayerController::AddActiveQuest_Implementation(const FString& QuestID)
+{
+	return true;
+}
+
+bool AThirdPersonPlayerController::IsQuestActive_Implementation(const FString& QuestID)
+{
+	return true;
+}
