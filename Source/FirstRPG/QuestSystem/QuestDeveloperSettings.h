@@ -15,11 +15,15 @@ class FIRSTRPG_API UQuestDeveloperSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(Config, EditAnywhere, Category = "QuestTargetCondition", meta = (RequiredMetaData,AllowPrivateAccess = "true"))
-	TMap<E_QuestTargetConditionType, TSubclassOf<UQuestTargetCondition>> ConditionMap;
+	UPROPERTY(Config, EditAnywhere, Category = "Quest", meta = (RequiredMetaData,AllowPrivateAccess = "true"))
+	TMap<FGameplayTag, TSubclassOf<UQuestTargetCondition>> ConditionMap;
+	UPROPERTY(Config, EditAnywhere, Category = "Quest", meta = (RequiredMetaData,AllowPrivateAccess = "true"))
+	TMap<FString,FGameplayTag> QuestTag2IDMap;
+	
 public:
 
 	
 	inline static const UQuestDeveloperSettings* Get() { return GetDefault<UQuestDeveloperSettings>(); }
-	inline const TMap<E_QuestTargetConditionType, TSubclassOf<UQuestTargetCondition>>  * GetConditionMap () const{return &ConditionMap;} 
+	inline const TMap<FGameplayTag, TSubclassOf<UQuestTargetCondition>>  * GetConditionMap () const{return &ConditionMap;} 
+	inline const TMap<FString,FGameplayTag> * GetQuesID2TagMap() const{return &QuestTag2IDMap;}
 };

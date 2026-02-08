@@ -2,15 +2,13 @@
 
 
 #include "QuestionSubsystem.h"
-
-#include <ThirdParty/ShaderConductor/ShaderConductor/External/DirectXShaderCompiler/include/dxc/DXIL/DxilConstants.h>
-
 #include "QuestTargetCondition.h"
 #include "GlobalQuestTargetMessenger.h"
+#include "QuestDeveloperSettings.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "FirstRPG/Character//ThirdPersonPlayerController.h"
+#include "FirstRPG/Character/Player/ThirdPersonPlayerController.h"
 
 void UQuestionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -39,6 +37,7 @@ void UQuestionSubsystem::Deinitialize()
 
 void UQuestionSubsystem::ReadQuestion()
 {
+	auto QuestID2TagMap = UQuestDeveloperSettings::Get()->GetQuesID2TagMap();
 	_QuestInfos.Reset();
 	if (DataTableRef) {
 		TArray<FName> RowNames = DataTableRef->GetRowNames();
@@ -48,7 +47,12 @@ void UQuestionSubsystem::ReadQuestion()
 				FString::Printf(TEXT("Cann't Find Row :%s"), *Name.ToString()),
 				true
 			);
-			_QuestInfos.Add(Name.ToString(),Question);
+			auto QuestTagPtr = QuestID2TagMap->Find(Name.ToString());
+			checkf(QuestTagPtr,
+			TEXT("Class: %s,Function:%s,Cannot Find QuestID map to Tag: QuestID: %s"),
+			*GetName(),*FString(__FUNCTION__),
+			*Name.ToString());
+			_QuestInfos.Add(*QuestTagPtr,Question);
 		}
 		
 		//每个任务的每个目标，都根据其条件描述数组生成对应条件实例
@@ -58,8 +62,8 @@ void UQuestionSubsystem::ReadQuestion()
 			{
 				for (auto &ConditionDescription : Target.EditedQuestTargetConditions)
 				{
-					Target.Conditions.Add(UQuestTargetCondition::QuestTargetConditionFactory(ConditionDescription.Type,
-						ConditionDescription.TargetTag,ConditionDescription.RequiredCount,this));
+					Target.Conditions.Add(UQuestTargetCondition::QuestTargetConditionFactory(
+						ConditionDescription.ActionTag,ConditionDescription.TargetTag,ConditionDescription.RequiredCount,this));
 				}
 			}
 		}
@@ -69,17 +73,17 @@ void UQuestionSubsystem::ReadQuestion()
 	}
 }
 
-FS_QuestInfo UQuestionSubsystem::GetQuest(const FString& QuestID)
+FS_QuestInfo UQuestionSubsystem::GetQuest(const FGameplayTag& QuestTag)
 {
 		
-	auto Quest = _QuestInfos.Find(QuestID);
+	auto Quest = _QuestInfos.Find(QuestTag);
 	if (Quest == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 100.f, FColor::Red, 
-			FString::Printf(TEXT("[%s] 无法查找到任务: %s"), *GetName(), *QuestID)	
+			FString::Printf(TEXT("[%s] 无法查找到任务: %s"), *GetName(), *QuestTag.ToString())	
 		);
 		GEngine->AddOnScreenDebugMessage(-1, 100.f, FColor::Red, 
-		FString::Printf(TEXT("调用者: %s | 错误ID: [%s]"), *GetOuter()->GetName(), *QuestID)    
+		FString::Printf(TEXT("调用者: %s | 错误ID: [%s]"), *GetOuter()->GetName(), *QuestTag.ToString())    
 		);
 		return FS_QuestInfo();
 	}
@@ -89,21 +93,21 @@ FS_QuestInfo UQuestionSubsystem::GetQuest(const FString& QuestID)
 	}
 }
 
-TArray<FString> UQuestionSubsystem::GetAllQuestID()
+TArray<FGameplayTag> UQuestionSubsystem::GetAllQuestID()
 {
-	TArray<FString> QuestIDs;
+	TArray<FGameplayTag> QuestIDs;
 	_QuestInfos.GenerateKeyArray(QuestIDs);
 	return QuestIDs;
 }
 
-FS_QuestTarget UQuestionSubsystem::GetQeustTarget(const FString& QuestID, int Stage)
+FS_QuestTarget UQuestionSubsystem::GetQuestTarget(const FGameplayTag& QuestTag, int Stage)
 {
-	auto Quest = _QuestInfos.Find(QuestID);
+	auto Quest = _QuestInfos.Find(QuestTag);
 	if (Quest == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,5.f,  
 		FColor::Red,
-		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestID)
+		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestTag.ToString())
 		);
 		return FS_QuestTarget();
 	}
@@ -113,19 +117,21 @@ FS_QuestTarget UQuestionSubsystem::GetQeustTarget(const FString& QuestID, int St
 			return Element;
 	}
 	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
-FString::Printf(TEXT("Class: %s,Cannot find Stage,QuestID:%s,Stage:%d"), *GetClass()->GetName(),*QuestID,Stage)
+FString::Printf(TEXT("Class: %s,Function: %s,Cannot find Stage,QuestID:%s,Stage:%d"), 
+			*GetClass()->GetName(),*FString(__FUNCTION__),
+			*QuestTag.ToString(),Stage)
 	);
 	return FS_QuestTarget();
 }
 
-FS_QuestTarget UQuestionSubsystem::GetNextQeustTarget(const FString& QuestID, int Stage)
+FS_QuestTarget UQuestionSubsystem::GetNextQuestTarget(const FGameplayTag& QuestTag, int Stage)
 {
-	auto Quest = _QuestInfos.Find(QuestID);
+	auto Quest = _QuestInfos.Find(QuestTag);
 	if (Quest == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,5.f,  
 		FColor::Red,
-		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestID)
+		FString::Printf(TEXT("Class: %s,Cannot find Question,QuestID:%s"), *GetClass()->GetName(),*QuestTag.ToString())
 		);
 		return FS_QuestTarget();
 	}
@@ -135,35 +141,38 @@ FS_QuestTarget UQuestionSubsystem::GetNextQeustTarget(const FString& QuestID, in
 			return Quest->Targets[i+1];
 	}
 	GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
-FString::Printf(TEXT("Class: %s,Cannot find Next Stage,QuestID:%s,Stage:%d"), *GetClass()->GetName(),*QuestID,Stage)
+FString::Printf(TEXT("Class: %s,Cannot find Next Stage,QuestID:%s,Stage:%d"), *GetClass()->GetName(),*QuestTag.ToString(),Stage)
 	);
 	return FS_QuestTarget(-1);
 }
 
-void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTargetData)
+void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTargetDescription)
 {
 	if (PlayerController)
 	{
 		bool ActiveTag = false;
 		FS_QuestInfo * QuestPtr = nullptr;
-		if (!_QuestInfos.Find(QuestTargetData.QuestID))
+		if (!_QuestInfos.Find(QuestTargetDescription.QuestTag))
 		{
 			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,
 	FString::Printf(TEXT("Class: %s,Function : %s,Cannot find Quest,QuestID:%s"), 
-				*GetClass()->GetName(),*FString(__FUNCTION__),*QuestTargetData.QuestID));
+				*GetClass()->GetName(),*FString(__FUNCTION__),*QuestTargetDescription.QuestTag.ToString()));
 			return;
 		}
-		else QuestPtr = &_QuestInfos[QuestTargetData.QuestID];
+		else QuestPtr = &_QuestInfos[QuestTargetDescription.QuestTag];
 		//如果是触发了某个任务的开始条件，则把它加入激活任务
 		bool AllPassed = true;
-		if (!QuestTargetData.Stage)
+		if (!QuestTargetDescription.Stage)
 		{
+			//如果条件为空，说明只能通过接取按钮激活
+			if (QuestPtr->Targets[0].Conditions.IsEmpty())
+				return;
 			ActiveTag = true;
 			for (auto &Condition : QuestPtr->Targets[0].Conditions)
 			{
-				if (Condition->GetQuestTargetConditionType() == QuestTargetData.Type)
+				if (Condition->GetQuestTargetConditionType() == QuestTargetDescription.ActionTag)
 				{
-					if (!Condition->ConditionPassed(QuestTargetData))
+					if (!Condition->ConditionPassed(QuestTargetDescription))
 					{
 						AllPassed = false;
 						return;
@@ -172,19 +181,19 @@ void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTarge
 				else AllPassed = Condition->GetPassed() && AllPassed;
 			}
 			if (AllPassed)
-				PlayerController->AddActiveQuest(QuestTargetData.QuestID);
+				PlayerController->AddActiveQuest(QuestTargetDescription.QuestTag);
 		}
 		if (ActiveTag) return;
 		//正常的任务推进
 		for (auto &Target : QuestPtr->Targets)
 		{
-			if (Target.StageInt == QuestTargetData.Stage)
+			if (Target.StageInt == QuestTargetDescription.Stage)
 			{
 				for (auto &Condition : Target.Conditions)
 				{
-					if (Condition->GetQuestTargetConditionType() == QuestTargetData.Type)
+					if (Condition->GetQuestTargetConditionType() == QuestTargetDescription.ActionTag)
 					{
-						if (!Condition->ConditionPassed(QuestTargetData))
+						if (!Condition->ConditionPassed(QuestTargetDescription))
 						{
 							AllPassed = false;
 							return;
@@ -193,13 +202,14 @@ void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTarge
 					else AllPassed = Condition->GetPassed() && AllPassed;
 				}
 				if (AllPassed)
-					PlayerController->GotoNextStage(QuestTargetData.QuestID);
+					PlayerController->GotoNextStage(QuestTargetDescription.QuestTag);
 			}
 		}
 	}
 	else
 	{
 		PlayerController = Cast<AThirdPersonPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		DeliverTargetCheck(QuestTargetDescription);
 	}
 
 }

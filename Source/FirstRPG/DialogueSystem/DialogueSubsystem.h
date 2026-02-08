@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DialogueDataAsset.h"
-#include "FirstRPG/Character//ThirdPersonPlayerController.h"
+#include "FirstRPG/Character/Player/ThirdPersonPlayerController.h"
 #include "DialogueSubsystem.generated.h"
 
 /**
@@ -24,8 +24,8 @@ class FIRSTRPG_API UDialogueSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 private:
 	//维护从任务ID到任务对话的映射
-	TMap<FString,FInQuestTargetDialogMap> DialogueAssetMap;
-	FString CurrentQuest;
+	TMap<FGameplayTag,FInQuestTargetDialogMap> DialogueAssetMap;
+	FGameplayTag CurrentQuest;
 	int CurrentStage;
 	size_t TextIt;
 	AThirdPersonPlayerController* CurrentPlayerController = nullptr;
@@ -33,7 +33,7 @@ private:
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	bool StartDialogue(const FString &QuestID, int Stage, AThirdPersonPlayerController* PlayerController);
+	bool StartDialogue(const FGameplayTag& QuestTag, int Stage, AThirdPersonPlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable,Category = "Dialogue")
 	bool EndDialogue();
 	

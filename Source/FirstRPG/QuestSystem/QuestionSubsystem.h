@@ -70,6 +70,17 @@ struct FS_PlayerQuestHandler
 	FS_PlayerHoldTarget CurrentTarget;
 };
 
+//NPC持有的相关任务目标结构
+USTRUCT(BlueprintType)
+struct FS_NPCHoldTarget
+{	
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	int StageInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
+	FGameplayTag ActionTag;
+};
+
 
 UCLASS(BlueprintType, Blueprintable,Category = "Quest")
 class FIRSTRPG_API UQuestionSubsystem : public UGameInstanceSubsystem
@@ -77,28 +88,28 @@ class FIRSTRPG_API UQuestionSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable,BlueprintPure,Category = "Quest")
-	FS_QuestInfo GetQuest(const FString& QuestID);
+	FS_QuestInfo GetQuest(const FGameplayTag& QuestTag);
 	UFUNCTION(BlueprintCallable,BlueprintPure, Category = "Quest")
-	TArray<FString> GetAllQuestID();
+	TArray<FGameplayTag> GetAllQuestID();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
-	inline bool HasQuest(const FString& QuestID)
+	inline bool HasQuest(const FGameplayTag& QuestID)
 	{
 		return _QuestInfos.Find(QuestID) != nullptr;
 	}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
-	FS_QuestTarget GetNextQeustTarget(const FString& QuestID,int Stage);
+	FS_QuestTarget GetNextQuestTarget(const FGameplayTag& QuestTag, int Stage);
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Quest")
-	FS_QuestTarget GetQeustTarget(const FString& QuestID,int Stage);
+	FS_QuestTarget GetQuestTarget(const FGameplayTag& QuestTag, int Stage);
 	UFUNCTION(BlueprintCallable,Category = "QuestTargetCondition")
 	void BroadcastFinish(FS_QuestTargetData QuestTargetData);
 
 	
 private:
-	TMap<FString,FS_QuestInfo> _QuestInfos;
+	TMap<FGameplayTag,FS_QuestInfo> _QuestInfos;
 	void ReadQuestion();
 	UFUNCTION()
-	void DeliverTargetCheck(const FS_QuestTargetData & QuestTargetData);
+	void DeliverTargetCheck(const FS_QuestTargetData & QuestTargetDescription);
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	bool ShouldCreateSubsystem(UObject* Outer) const override{

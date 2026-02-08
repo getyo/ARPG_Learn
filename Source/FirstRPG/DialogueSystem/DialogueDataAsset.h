@@ -30,8 +30,9 @@ public:
 	//目前只打算有文本实例，如果之后还有其它如声音，字体等可以添加在这里
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	TArray<FDialogueLine> DialogueLines;
+	//编辑器编辑的Tag
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	FString RelativeQuestID;
+	FGameplayTag RelativeQuestTag;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	int Stage;
 };

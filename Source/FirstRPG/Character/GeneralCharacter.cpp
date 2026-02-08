@@ -28,21 +28,6 @@ void AGeneralCharacter::BeginPlay()
 	}
 }
 
-inline  bool AGeneralCharacter::IsQuestRelative_Implementation()
-{
-	return QuestRelative;
-}
-
-TArray<FString> AGeneralCharacter::GetRelativeQuest_Implementation()
-{
-	return TArray<FString>();
-}
-
-int AGeneralCharacter::GetRelativeQuestStage_Implementation(const FString& QuestID)
-{
-	return -1;
-}
-
 // Called every frame
 void AGeneralCharacter::Tick(float DeltaTime)
 {

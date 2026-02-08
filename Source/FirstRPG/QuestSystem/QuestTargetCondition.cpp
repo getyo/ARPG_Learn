@@ -3,7 +3,7 @@
 
 #include "QuestTargetCondition.h"
 #include "QuestDeveloperSettings.h"
-const TMap<E_QuestTargetConditionType,TSubclassOf<UQuestTargetCondition>>* UQuestTargetCondition::_E2Class = nullptr;
+const TMap<FGameplayTag,TSubclassOf<UQuestTargetCondition>>* UQuestTargetCondition::_E2Class = nullptr;
 
 UQuestTargetCondition::UQuestTargetCondition()
 {
@@ -14,16 +14,16 @@ void UQuestTargetCondition::InitQuestTargetCondition()
 	_E2Class = UQuestDeveloperSettings::Get()->GetConditionMap();
 }
 
-UQuestTargetCondition* UQuestTargetCondition::QuestTargetConditionFactory(E_QuestTargetConditionType Type,FGameplayTag TargetTag,
-		int RequestedNum,UObject* Outer)
+UQuestTargetCondition* UQuestTargetCondition::QuestTargetConditionFactory(FGameplayTag ActionTag,
+		FGameplayTag TargetTag,int RequestedNum,UObject* Outer)
 {
-	const TSubclassOf<UQuestTargetCondition>* ConditionClass = _E2Class->Find(Type);
+	const TSubclassOf<UQuestTargetCondition>* ConditionClass = _E2Class->Find(ActionTag);
 	if (!ConditionClass)
 	{
-		const UEnum * EnumClass = StaticEnum<E_QuestTargetConditionType>();
-		UE_LOG(LogTemp, Error, TEXT("Class: %s, Cannot find subclass of %s: %s"),
-			*UQuestTargetCondition::StaticClass()->GetName(),*UQuestTargetCondition::StaticClass()->GetName(),
-			*EnumClass->GetNameByValue(static_cast<int>(Type)).ToString());
+		GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
+								 FString::Printf(TEXT("Class: %s,Function: %s,Cannot Find ActonTag: %s"), 
+												 *StaticClass()->GetName(),*FString(__FUNCTION__),
+												 *ActionTag.ToString()));
 		return nullptr;
 	}
 	auto NewCondition =  NewObject<UQuestTargetCondition>(Outer, *ConditionClass);
