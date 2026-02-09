@@ -2,11 +2,11 @@
 
 
 #include "DialogueCondition.h"
-UE_DEFINE_GAMEPLAY_TAG(TalkConditionTag, "Action.Talk")
+UE_DEFINE_GAMEPLAY_TAG(TalkConditionTag, "Quest.Action.Talk")
 
 UDialogueCondition::UDialogueCondition()
 {
-	this->_Type = E_QuestTargetConditionType::Talk;
+	this->_Type = TalkConditionTag;
 }
 
 bool UDialogueCondition::ConditionPassed(const FS_QuestTargetData& QuestTargetData)

@@ -6,24 +6,12 @@
 #include "GameplayTagContainer.h"
 #include "QuestTargetCondition.generated.h"
 
-UENUM(BlueprintType) // 允许在蓝图中使用
-enum class E_QuestTargetConditionType : uint8
-{
-	None        UMETA(DisplayName = "None"),          // 显示名称
-	Kill        UMETA(DisplayName = "Kill Monster"),  // 击杀
-	Talk        UMETA(DisplayName = "Talk to NPC"),   // 对话
-	Collect     UMETA(DisplayName = "Collect Item"),  // 收集
-	Interact    UMETA(DisplayName = "Interact"),      // 交互
-};
-
 //数据表格里面用户编辑的任务条件，不是真正操作的条件
 //真正操作的条件根据这些信息工厂生成
 USTRUCT(BlueprintType, Blueprintable)
 struct FS_QuestTargetConditionInfo
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	E_QuestTargetConditionType Type;
 	//用于定义当前的事件类型：击杀敌人，取得指定物品等
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGameplayTag ActionTag;
@@ -41,13 +29,9 @@ struct FS_QuestTargetData
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString QuestID;
+	FGameplayTag QuestTag;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Stage;
-	//以下两个目前来说是一样的，因为动作类型目前来讲没有和完成方式区分
-	//但是之后可能区分，为了未来兼容所以保留了两个成员
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	E_QuestTargetConditionType Type;
 	//用于定义当前的事件类型：击杀敌人，取得指定物品等
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag ActionTag;
@@ -74,13 +58,11 @@ public:
 	{
 		return true;
 	} 
-	static UQuestTargetCondition* QuestTargetConditionFactory(E_QuestTargetConditionType Type,
-		FGameplayTag TargetTag,
-		int RequestedNum=0,
+	static UQuestTargetCondition* QuestTargetConditionFactory(FGameplayTag ActionTag,FGameplayTag TargetTag,int RequestedNum=0,
 		UObject* Outer = nullptr);
 	static void InitQuestTargetCondition();
 	UQuestTargetCondition();
-	inline E_QuestTargetConditionType GetQuestTargetConditionType() const
+	inline FGameplayTag GetQuestTargetConditionType() const
 	{
 		return _Type;
 	}
@@ -89,9 +71,9 @@ public:
 		return HasPassed;
 	}
 private:
-	static const TMap<E_QuestTargetConditionType,TSubclassOf<UQuestTargetCondition>>* _E2Class;
+	static const TMap<FGameplayTag,TSubclassOf<UQuestTargetCondition>>* _E2Class;
 protected:
-	E_QuestTargetConditionType _Type;
+	FGameplayTag _Type;
 	bool HasPassed = false;
 	virtual void SetDefaultProperties(FGameplayTag TargetTag,int RequestedNum=0,UObject* Outer = nullptr){}
 	

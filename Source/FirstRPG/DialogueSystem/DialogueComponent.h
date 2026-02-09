@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "DialogueSubsystem.h"
-#include "FirstRPG/Character//ThirdPersonPlayerController.h"
+#include "FirstRPG/Character/Player/ThirdPersonPlayerController.h"
 #include "DialogueComponent.generated.h"
 
 
@@ -37,11 +37,11 @@ public:
 	}
 	
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	bool StartDialogue(const FString &QuestID,const int Stage,AThirdPersonPlayerController* PlayerController)
+	bool StartDialogue(const FGameplayTag &QuestTag,const int Stage,AThirdPersonPlayerController* PlayerController)
 	{
 		if (DialogueSubsystem)
 		{
-			return DialogueSubsystem->StartDialogue(QuestID,Stage,PlayerController);
+			return DialogueSubsystem->StartDialogue(QuestTag,Stage,PlayerController);
 		}
 		return false;
 	}

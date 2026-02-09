@@ -28,11 +28,11 @@ void UDialogueSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		if (auto Asset = Cast<UDialogueDataAsset>(Elem.GetAsset()))
 		{
 			//是否存在当前任务
-			if (!DialogueAssetMap.Contains(Asset->RelativeQuestID))
+			if (!DialogueAssetMap.Contains(Asset->RelativeQuestTag))
 			{
-				DialogueAssetMap.Add(Asset->RelativeQuestID,FInQuestTargetDialogMap());
+				DialogueAssetMap.Add(Asset->RelativeQuestTag,FInQuestTargetDialogMap());
 			}
-			FInQuestTargetDialogMap * InQuestTargetDialogMapPtr = DialogueAssetMap.Find(Asset->RelativeQuestID);
+			FInQuestTargetDialogMap * InQuestTargetDialogMapPtr = DialogueAssetMap.Find(Asset->RelativeQuestTag);
 			//是否存在当前阶段
 			if (!InQuestTargetDialogMapPtr->Map.Contains(Asset->Stage))
 			{
@@ -48,26 +48,26 @@ void UDialogueSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-bool UDialogueSubsystem::StartDialogue(const FString& QuestID, int Stage, AThirdPersonPlayerController* PlayerController)
+bool UDialogueSubsystem::StartDialogue(const FGameplayTag& QuestTag, int Stage, AThirdPersonPlayerController* PlayerController)
 {
-	if (!DialogueAssetMap.Contains(QuestID))
+	if (!DialogueAssetMap.Contains(QuestTag))
 	{
 		GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
 			FString::Printf(TEXT("Class : %s, Cannot Find Quest's Dialogue: QuestID : %s"),
-				*GetClass()->GetName(),*QuestID));
+				*GetClass()->GetName(),*QuestTag.ToString()));
 		return false;
 	}
-	FInQuestTargetDialogMap * InQuestTargetDialogMapPtr = DialogueAssetMap.Find(QuestID);
+	FInQuestTargetDialogMap * InQuestTargetDialogMapPtr = DialogueAssetMap.Find(QuestTag);
 	//是否存在当前阶段
 	if (!InQuestTargetDialogMapPtr->Map.Contains(Stage))
 	{
 		GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
 	FString::Printf(TEXT("Class : %s, Cannot Find QuestStage's Dialogue: QuestID : %s , Stage : %d"),
-		*GetClass()->GetName(),*QuestID,Stage));
+		*GetClass()->GetName(),*QuestTag.ToString(),Stage));
 		return false;
 	}
 	
-	CurrentQuest = QuestID;
+	CurrentQuest = QuestTag;
 	CurrentStage = Stage;
 	TextIt = 0;
 	CurrentDialogueAsset = InQuestTargetDialogMapPtr->Map[Stage];
@@ -121,15 +121,15 @@ bool UDialogueSubsystem::EndDialogue()
 			
 	}
 	//广播对话完成
-	if (!CurrentDialogueAsset->RelativeQuestID.IsEmpty())
+	//标签无效说明为日常对话，不用广播
+	if (CurrentDialogueAsset->RelativeQuestTag.IsValid())
 	{
 		auto QuestSys = GI->GetSubsystem<UQuestionSubsystem>();
 		QuestSys->BroadcastFinish(FS_QuestTargetData(
-			CurrentDialogueAsset->RelativeQuestID,
+			CurrentQuest,
 			CurrentStage,
-			E_QuestTargetConditionType::Talk,
 			TalkConditionTag,
-			FGameplayTag(),
+			FGameplayTag::EmptyTag,
 			0,
 			CurrentPlayerController,
 			nullptr));

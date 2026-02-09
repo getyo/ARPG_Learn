@@ -19,6 +19,6 @@ FString UCharacterManagerSubsystem::GenerateID(AGeneralCharacter *Character)
 	FGuid Guid = FGuid::NewGuid();
 	FString ID = Guid.ToString();
 	ID2CharcCharacterMap.Add(ID,Character);
-	Name2IDMap.Add(Character->CharacterNameTag,ID);
+	Name2IDMap.Add(Character->CharacterTag,ID);
 	return ID;
 }
