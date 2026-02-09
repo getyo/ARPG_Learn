@@ -19,7 +19,7 @@ struct FDialogueLine
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	FText DialogueText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	FGameplayTag SpeakerName;
+	FGameplayTag SpeakerTag;
 };
 
 UCLASS(BlueprintType)

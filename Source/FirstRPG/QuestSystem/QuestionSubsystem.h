@@ -28,7 +28,7 @@ struct FS_QuestTarget
 	TArray<UQuestTargetCondition*> Conditions;
 };
 
-//任务结构
+//数据表格编辑的任务结构
 USTRUCT(BlueprintType)
 struct FS_QuestInfo: public FTableRowBase
 {

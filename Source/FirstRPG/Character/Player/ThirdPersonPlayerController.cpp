@@ -1,6 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "ThirdPersonPlayerController.h"
 
+void AThirdPersonPlayerController::QuestFinished_Implementation(const FGameplayTag& QuestTag)
+{
+	ActiveQuests[QuestTag].IsFinished = true;
+	FocusedQuest = FGameplayTag::EmptyTag;
+	ActiveQuests.Remove(QuestTag);
+}
+
 void AThirdPersonPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -119,7 +126,7 @@ void AThirdPersonPlayerController::GotoNextStage_Implementation(const FGameplayT
 			//任务结束
 			else
 			{
-				HoldQuest.IsFinished = true;
+				QuestFinished(QuestTag);
 			}
 			break;
 		}
