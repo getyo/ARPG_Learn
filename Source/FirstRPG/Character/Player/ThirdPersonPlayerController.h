@@ -42,6 +42,8 @@ public:
 	void GotoNextStage(const FGameplayTag& QuestTag);
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "Quest")
 	bool SetFocusedQuest(const FGameplayTag& QuestTag);
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "Quest")
+	void QuestFinished(const FGameplayTag& QuestTag);
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Quest")

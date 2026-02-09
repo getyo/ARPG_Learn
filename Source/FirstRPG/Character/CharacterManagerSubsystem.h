@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GeneralCharacter.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "NativeGameplayTags.h"
 #include "CharacterManagerSubsystem.generated.h"
 
+
+class AGeneralActor;
 /**
  * 
  */
@@ -17,7 +19,8 @@ class FIRSTRPG_API UCharacterManagerSubsystem : public UGameInstanceSubsystem
 private:
 	FCriticalSection IDMutex;
 	TMap<FString,AGeneralCharacter*> ID2CharcCharacterMap;
-	TMap<FGameplayTag,FString> Name2IDMap;
+	TMap<FString,FString> Name2IDMap;
+	TMap<FGameplayTag,FString> Tag2IDMap;
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -26,13 +29,14 @@ public:
 	FString GenerateID(AGeneralCharacter * Character);
 	
 	UFUNCTION(BlueprintCallable,BlueprintPure,Category= "Character Mannger")
-	inline FString GetCharacterID(const FGameplayTag& CharacterName) const
+	inline FString GetCharacterID(const FString& CharacterName) const
 	{
 		if (!Name2IDMap.Contains(CharacterName))
 		{
 			GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
-				FString::Printf(TEXT("Class : %s, Cannot find Character: Name : %s"),
-					*GetClass()->GetName(),*CharacterName.ToString()));
+				FString::Printf(TEXT("Class: %s,Function: %s, Cannot find Character: Name : %s"),
+					*GetClass()->GetName(),*FString(__FUNCTION__),
+					*CharacterName));
 			return "";
 		}
 		return Name2IDMap[CharacterName];
@@ -53,9 +57,12 @@ public:
 	}
 	
 	UFUNCTION(BlueprintCallable,Category= "Character Mannger")
-	inline AGeneralCharacter* GetCharacterByName(const FGameplayTag& CharacterName) const
+	inline AGeneralCharacter* GetCharacterByName(const FString& Character) const
 	{
-		auto ID = GetCharacterID(CharacterName);
+		auto ID = GetCharacterID(Character);
 		return GetCharacterByID(ID);
 	}
+	//利用Tag来获取角色，唯一性由你自己设计的Tag保证。
+	UFUNCTION(BlueprintCallable,Category= "Character Mannger")
+	inline AGeneralCharacter* GetCharacterByTag(const FGameplayTag& CharacterTag) const;
 };

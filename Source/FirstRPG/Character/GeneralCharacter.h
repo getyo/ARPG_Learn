@@ -15,14 +15,16 @@ class FIRSTRPG_API AGeneralCharacter : public ACharacter
 
 public:
 	AGeneralCharacter();
-	// Sets default values for this character's properties
-	AGeneralCharacter(const FString &CharacterName);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Quest")
-	bool QuestRelative = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
+	FGameplayTag CharacterTag;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
+	FString CharacterName;
+	//仅作显示用
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
+	FString DisplayName;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -30,16 +32,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
-	inline FString GetCharacterID() const
-	{
-		return CharacterID;
-	}
+	inline FString GetCharacterID() const{return CharacterID;}
+	inline FString GetCharacterName() const{ return CharacterName; }
+	inline FString GetDisplayName() const{return DisplayName;}
+	inline FGameplayTag GetCharacterTag() const{return CharacterTag;}
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FGameplayTag CharacterTag;
-	//仅作显示用，真正内部使用的是ID和Tag
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
-	FString DisplayName;
 private:
 	FString CharacterID = "";
 };

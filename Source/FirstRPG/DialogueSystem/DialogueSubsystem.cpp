@@ -10,6 +10,7 @@
 #include "Engine/World.h"
 #include "../QuestSystem/QuestionSubsystem.h"
 #include "../QuestSystem/DialogueCondition.h"
+#include "FirstRPG/Character/GeneralCharacter.h"
 #include "FirstRPG/Character/CharacterManagerSubsystem.h"
 
 void UDialogueSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -80,11 +81,11 @@ bool UDialogueSubsystem::StartDialogue(const FGameplayTag& QuestTag, int Stage, 
 	//把所有相关的Character的InDialogye设置为true
 	for (auto Elem : CurrentDialogueAsset->DialogueLines)
 	{
-		Characters.Add(Elem.SpeakerName);
+		Characters.Add(Elem.SpeakerTag);
 	}
-	for (auto CharacterID : Characters)
+	for (auto CharacterTag : Characters)
 	{
-		if (auto Character = CharacterManager->GetCharacterByName(CharacterID))
+		if (auto Character = CharacterManager->GetCharacterByTag(CharacterTag))
 		{
 			UDialogueComponent* DialogueComp = Character->FindComponentByClass<UDialogueComponent>();
 			if (DialogueComp)
@@ -106,11 +107,11 @@ bool UDialogueSubsystem::EndDialogue()
 	//把所有相关的Character的InDialogye设置为true
 	for (auto Elem : DialogueAssetMap[CurrentQuest].Map[CurrentStage]->DialogueLines)
 	{
-		Characters.Add(Elem.SpeakerName);
+		Characters.Add(Elem.SpeakerTag);
 	}
-	for (auto CharacterName : Characters)
+	for (auto CharacterTag : Characters)
 	{
-		if (auto Character = CharacterManager->GetCharacterByName(CharacterName))
+		if (auto Character = CharacterManager->GetCharacterByTag(CharacterTag))
 		{
 			UDialogueComponent* DialogueComp = Character->FindComponentByClass<UDialogueComponent>();
 			if (DialogueComp)
