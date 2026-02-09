@@ -29,7 +29,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable,Category = "Quest")
-	void SendTargetFinish(int Cnt,AController * TargetInstigator);
+	void SendTargetFinish(const FGameplayTag& ActionTag, int Cnt, AController * TargetInstigator);
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")
 	TMap<FGameplayTag,FS_NPCHoldQuestTargets> RelativeQuestMap;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")

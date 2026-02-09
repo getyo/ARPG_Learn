@@ -23,7 +23,7 @@ void ANPCCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ANPCCharacter::SendTargetFinish(int Cnt, AController* TargetInstigator)
+void ANPCCharacter::SendTargetFinish(const FGameplayTag& ActionTag, int Cnt, AController* TargetInstigator)
 {
 	if (!PlayerController)
 		PlayerController = Cast<AThirdPersonPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -38,15 +38,17 @@ void ANPCCharacter::SendTargetFinish(int Cnt, AController* TargetInstigator)
 		{
 			if (Target.StageInt == PlayerController->GetQuestStageInt(Pair.Key))
 			{
-				QuestSubsystem->BroadcastFinish(FS_QuestTargetData(
-					Pair.Key,
-					Target.StageInt,
-					Target.ActionTag,
-					CharacterTag,
-					Cnt,
-					TargetInstigator,
-					nullptr
-					));
+				if (ActionTag == Target.ActionTag){
+					QuestSubsystem->BroadcastFinish(FS_QuestTargetData(
+						Pair.Key,
+						Target.StageInt,
+						Target.ActionTag,
+						CharacterTag,
+						Cnt,
+						TargetInstigator,
+						nullptr
+						));
+				}
 			}
 		}
 	}
