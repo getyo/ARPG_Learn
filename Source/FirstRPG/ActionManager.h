@@ -4,20 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include <map>
-#include <vector>
-#include <string>
-#include "S_ActionInterruptTableRow.h"
+#include "NativeGameplayTags.h"
 #include "ActionManager.generated.h"
 #define MAX_ACTION_NUM  100
 
-USTRUCT(BlueprintType)
-struct FActionGraphRow
+USTRUCT()
+struct FS_ActionInterruptTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<uint8> Row;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag ActionTag;
+	//这个动作可以被哪些其他动作打断或共存
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSet<FGameplayTag> CanBeInterrupt;
 };
 
 UCLASS( ClassGroup=(Action), meta=(BlueprintSpawnableComponent),Blueprintable )
@@ -28,49 +27,22 @@ class FIRSTRPG_API UActionManager : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UActionManager();
-
-	UPROPERTY(VisibleAnywhere, Category = "ActionManager")
-	TMap<FString, int32> ActionName2Num;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActionManager")
-	UDataTable* ActionTable;
-  
-    UPROPERTY(VisibleAnywhere, Category = "ActionManager")
-    TArray<FActionGraphRow> ActionGraph;
-
-	UPROPERTY(VisibleAnywhere, Category = "ActionManager")
-	TArray<FString> ActionNum2Name;
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	bool CanExe(const FString& ActionName);
-
+	bool CanExe(const FGameplayTag& ActionName);
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void EndAction(const FString& ActionName) {
-		int Num = GetActionNum(ActionName);
-		if (!ActiveActions.Find(Num)) {
-			UE_LOG(LogTemp, Warning, TEXT("Action %s not active"), *ActionName);
-		}
-		ActiveActions.Remove(Num);
-	}
+	FORCEINLINE void EndAction(const FGameplayTag& Action);
 
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-private:
-	TSet<int> ActiveActions;
-    FORCEINLINE int GetActionNum(const FString& ActionName) {
-		if (!ActionName2Num.Find(ActionName)) {
-			UE_LOG(LogTemp, Error, TEXT("Haven't Action Name: %s"), *ActionName);
-		}
-        return ActionName2Num[ActionName];
-    }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActionManager")
+	UDataTable* ActionTable;
+	TMap<FGameplayTag,TSet<FGameplayTag>> ActionTableMap;
+	TSet<FGameplayTag> ActiveActions;
+
 	void ReadActionTable();
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };
-
-#define OUT_A_CANBEINTBY_B(A,B) (ActionGraph[GetActionNum(B)].Row[GetActionNum(A)])
