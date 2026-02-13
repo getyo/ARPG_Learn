@@ -48,7 +48,7 @@ public:
 	FORCEINLINE void EndAction(const FString& ActionName) {
 		int Num = GetActionNum(ActionName);
 		if (!ActiveActions.Find(Num)) {
-			UE_LOG(LogTemp, Error, TEXT("Action %s not active"), *ActionName);
+			UE_LOG(LogTemp, Warning, TEXT("Action %s not active"), *ActionName);
 		}
 		ActiveActions.Remove(Num);
 	}
@@ -66,7 +66,6 @@ private:
         return ActionName2Num[ActionName];
     }
 	void ReadActionTable();
-	void PrintActiveAction();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

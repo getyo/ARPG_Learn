@@ -42,21 +42,21 @@ void UActionManager::ReadActionTable() {
 				ActionNum2Name.Add(Name.ToString());
 				FActionGraphRow GraphRow; // 每次循环都新建一个
 				GraphRow.Row.SetNum(ActionCnt);
-				UE_LOG(LogTemp, Warning, TEXT("Load %s %d Actions\n\n"), *Name.ToString(), Row->ActionNum);
+				UE_LOG(LogConfig, Verbose, TEXT("Load %s %d Actions\n\n"), *Name.ToString(), Row->ActionNum);
 				for (int i = 0; i < ActionCnt; i++) {
 					GraphRow.Row[i] = Row->InterrputionVector[i];
 				}
 				Num++;
 				ActionGraph.Add(GraphRow);
-				UE_LOG(LogTemp, Error, TEXT("ActionGraph rows :%d \n Row members: %d"), ActionGraph.Num(), ActionGraph[0].Row.Num());
+				UE_LOG(LogConfig, Verbose, TEXT("ActionGraph rows :%d \n Row members: %d"), ActionGraph.Num(), ActionGraph[0].Row.Num());
 			}
 		}
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("No Action Table!"));
+		UE_LOG(LogConfig, Error, TEXT("No Action Table!"));
 	}
-	// ...
-	UE_LOG(LogTemp, Error, TEXT("ActionGraph rows :%d \n Row members: %d"),ActionGraph.Num(),ActionGraph[0].Row.Num());
+	/*
+	UE_LOG(LogTemp, Verbose, TEXT("ActionGraph rows :%d \n Row members: %d"),ActionGraph.Num(),ActionGraph[0].Row.Num());
 	for (int i = 0; i < ActionGraph.Num();++i) {
 		for (int j = 0; j < ActionGraph[i].Row.Num();++j) {
 			UE_LOG(LogTemp, Error, TEXT("%s\t %s \t %d \t"),
@@ -65,6 +65,7 @@ void UActionManager::ReadActionTable() {
 		UE_LOG(LogTemp, Error, TEXT("\n"));
 	}
 	UE_LOG(LogTemp, Error, TEXT("Attack can be int by WasHit? %d"), OUT_A_CANBEINTBY_B("Attack", "WasHit"));
+	*/
 }
 
 
@@ -102,8 +103,3 @@ void UActionManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
-void UActionManager::PrintActiveAction() {
-	for(auto action :ActiveActions) {
-		UE_LOG(LogTemp, Warning, TEXT("Active Actions: %s"), *ActionNum2Name[action]);
-	}
-}
