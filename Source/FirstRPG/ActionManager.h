@@ -30,10 +30,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "ActionManager")
 	bool CanExe(const FGameplayTag& ActionName);
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void EndAction(const FGameplayTag& Action);
+	UFUNCTION(BlueprintCallable)
+	void PrintAllActiveAction();
 
 
 protected:
