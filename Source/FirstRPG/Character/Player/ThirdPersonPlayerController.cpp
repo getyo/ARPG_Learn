@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "ThirdPersonPlayerController.h"
+#include "FirstRPG/Debug/Debug.h"
 
 void AThirdPersonPlayerController::QuestFinished_Implementation(const FGameplayTag& QuestTag)
 {
@@ -17,9 +18,7 @@ void AThirdPersonPlayerController::BeginPlay()
 		QuestSubsystem= GI->GetSubsystem<UQuestionSubsystem>();
 		if (!QuestSubsystem)
 		{
-			GEngine->AddOnScreenDebugMessage(-1,20.f,FColor::Red,
-			   FString::Printf(TEXT("Class : %s,Function: %s,Cannot get Quest SubSystem"),
-				  *GetName(),*FString(__FUNCTION__)));
+			CPP_LOG(Error,"Cannot get Quest SubSystem");
 		}
 	}
 }

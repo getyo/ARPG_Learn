@@ -2,6 +2,7 @@
 
 
 #include "ActionManager.h"
+#include "FirstRPG/Debug/Debug.h"
 
 // Sets default values for this component's properties
 UActionManager::UActionManager()
@@ -24,7 +25,7 @@ void UActionManager::BeginPlay()
 }
 
 void UActionManager::ReadActionTable() {
-	ActionGraph.Reset();
+	ActionTableMap.Reset();
 	FS_ActionInterruptTableRow* Row;
 	//UE_LOG(LogTemp, Warning, TEXT("ActionTable ptr: %p"), ActionTable);
 	if (ActionTable) {
@@ -38,25 +39,15 @@ void UActionManager::ReadActionTable() {
 				true
 			);
 			if (Row) {
-				ActionName2Num.Add(Name.ToString(), Row->ActionNum);
-				ActionNum2Name.Add(Name.ToString());
-				FActionGraphRow GraphRow; // 每次循环都新建一个
-				GraphRow.Row.SetNum(ActionCnt);
-				UE_LOG(LogTemp, Warning, TEXT("Load %s %d Actions\n\n"), *Name.ToString(), Row->ActionNum);
-				for (int i = 0; i < ActionCnt; i++) {
-					GraphRow.Row[i] = Row->InterrputionVector[i];
-				}
-				Num++;
-				ActionGraph.Add(GraphRow);
-				UE_LOG(LogTemp, Error, TEXT("ActionGraph rows :%d \n Row members: %d"), ActionGraph.Num(), ActionGraph[0].Row.Num());
+				ActionTableMap.Add(Row->ActionTag,Row->CanBeInterrupt);
 			}
 		}
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("No Action Table!"));
+		UE_LOG(LogConfig, Error, TEXT("No Action Table!"));
 	}
-	// ...
-	UE_LOG(LogTemp, Error, TEXT("ActionGraph rows :%d \n Row members: %d"),ActionGraph.Num(),ActionGraph[0].Row.Num());
+	/*
+	UE_LOG(LogTemp, Verbose, TEXT("ActionGraph rows :%d \n Row members: %d"),ActionGraph.Num(),ActionGraph[0].Row.Num());
 	for (int i = 0; i < ActionGraph.Num();++i) {
 		for (int j = 0; j < ActionGraph[i].Row.Num();++j) {
 			UE_LOG(LogTemp, Error, TEXT("%s\t %s \t %d \t"),
@@ -65,32 +56,35 @@ void UActionManager::ReadActionTable() {
 		UE_LOG(LogTemp, Error, TEXT("\n"));
 	}
 	UE_LOG(LogTemp, Error, TEXT("Attack can be int by WasHit? %d"), OUT_A_CANBEINTBY_B("Attack", "WasHit"));
+	*/
 }
 
 
-bool UActionManager::CanExe(const FString &ActionName) {
-	int RequsetAcNum = GetActionNum(ActionName);
-	/*
-	if (!ActionName.Compare("Die")) {
-		PrintActiveAction();
-	}
-	*/
-
+bool UActionManager::CanExe(const FGameplayTag &Action) {
 	if (!ActiveActions.Num()) {
-		ActiveActions.Add(RequsetAcNum);
+		ActiveActions.Add(Action);
 		return true;
 	}
 
 	bool CanExe = true;
-	for (auto ActiveAcNum : ActiveActions) {
-		CanExe = CanExe && ActionGraph[RequsetAcNum].Row[ActiveAcNum];
+	for (auto ActiveAction : ActiveActions) {
+		CanExe = CanExe && ActionTableMap[ActiveAction].Contains(Action);
 	}
 	if (CanExe) {
-		ActiveActions.Add(RequsetAcNum);
+		ActiveActions.Add(Action);
 		return true;
 	}
 	else return false;
-		
+}
+
+void UActionManager::EndAction(const FGameplayTag& Action)
+{
+	if (!ActiveActions.Contains(Action))
+	{	
+		CPP_LOG(Warning,FString::Printf(TEXT("%s is not Active,it cannot be end"),*Action.ToString()));
+		return;
+	}
+	ActiveActions.Remove(Action);
 }
 
 
@@ -102,8 +96,3 @@ void UActionManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
-void UActionManager::PrintActiveAction() {
-	for(auto action :ActiveActions) {
-		UE_LOG(LogTemp, Warning, TEXT("Active Actions: %s"), *ActionNum2Name[action]);
-	}
-}

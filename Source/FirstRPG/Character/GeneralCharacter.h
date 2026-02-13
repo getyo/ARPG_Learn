@@ -5,8 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
-#include "FirstRPG/QuestSystem/QuestRelativeInterface.h"
 #include "GeneralCharacter.generated.h"
+
+UENUM(NotBlueprintType)
+enum class ECharacterFaction :uint8
+{
+	PlayerFriend,
+	Enemy,
+	None
+};
 
 UCLASS(Abstract, Blueprintable,BlueprintType)
 class FIRSTRPG_API AGeneralCharacter : public ACharacter
@@ -25,6 +32,8 @@ protected:
 	//仅作显示用
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
 	FString DisplayName;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
+	ECharacterFaction CharacterFaction = ECharacterFaction::None;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -33,10 +42,14 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FString GetCharacterID() const{return CharacterID;}
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FString GetCharacterName() const{ return CharacterName; }
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FString GetDisplayName() const{return DisplayName;}
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FGameplayTag GetCharacterTag() const{return CharacterTag;}
-
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
+	inline ECharacterFaction GetCharacterFaction() const{return CharacterFaction;}
 private:
 	FString CharacterID = "";
 };
