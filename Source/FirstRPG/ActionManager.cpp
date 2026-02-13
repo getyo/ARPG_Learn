@@ -60,7 +60,7 @@ void UActionManager::ReadActionTable() {
 }
 
 
-bool UActionManager::CanExe(const FGameplayTag &Action) {
+bool UActionManager::CanExe_Implementation(const FGameplayTag &Action) {
 	if (!ActiveActions.Num()) {
 		ActiveActions.Add(Action);
 		return true;
@@ -85,6 +85,16 @@ void UActionManager::EndAction(const FGameplayTag& Action)
 		return;
 	}
 	ActiveActions.Remove(Action);
+}
+
+void UActionManager::PrintAllActiveAction()
+{
+	FString AllActiveActions = "";
+	for (auto ActiveAction : ActiveActions)
+	{
+		AllActiveActions += ActiveAction.ToString() + "\n";
+	}
+	CPP_LOG(Verbose,AllActiveActions);
 }
 
 
