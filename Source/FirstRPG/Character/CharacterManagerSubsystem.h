@@ -8,7 +8,7 @@
 #include "CharacterManagerSubsystem.generated.h"
 
 
-class AGeneralActor;
+class AGeneralItemActor;
 /**
  * 
  */
