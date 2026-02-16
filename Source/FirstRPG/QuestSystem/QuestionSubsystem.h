@@ -72,7 +72,7 @@ struct FS_PlayerQuestHandler
 
 //NPC持有的相关任务目标结构
 USTRUCT(BlueprintType)
-struct FS_NPCHoldTarget
+struct FS_ActorHoldTarget
 {	
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
