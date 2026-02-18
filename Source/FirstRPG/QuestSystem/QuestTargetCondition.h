@@ -31,7 +31,7 @@ struct FS_QuestTargetData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag QuestTag;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Stage;
+	int Stage = -1;
 	//用于定义当前的事件类型：击杀敌人，取得指定物品等
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag ActionTag;

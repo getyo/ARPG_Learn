@@ -72,7 +72,7 @@ struct FS_PlayerQuestHandler
 
 //NPC持有的相关任务目标结构
 USTRUCT(BlueprintType)
-struct FS_NPCHoldTarget
+struct FS_ActorHoldTarget
 {	
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
@@ -112,7 +112,7 @@ private:
 	void DeliverTargetCheck(const FS_QuestTargetData & QuestTargetDescription);
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	bool ShouldCreateSubsystem(UObject* Outer) const override{
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override{
 		// 如果当前的类【正好就是】这个 C++ 类（而不是它的蓝图子类），就返回 false
 		if (GetClass() == UQuestionSubsystem::StaticClass())
 		{
