@@ -160,8 +160,8 @@ void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTarge
 			return;
 		}
 		else QuestPtr = &_QuestInfos[QuestTargetDescription.QuestTag];
-		//如果是触发了某个任务的开始条件，则把它加入激活任务
 		bool AllPassed = true;
+		//如果是触发了某个任务的开始条件，则把它加入激活任务
 		if (!QuestTargetDescription.Stage)
 		{
 			//如果条件为空，说明只能通过接取按钮激活
@@ -184,6 +184,7 @@ void UQuestionSubsystem::DeliverTargetCheck(const FS_QuestTargetData& QuestTarge
 				PlayerController->AddActiveQuest(QuestTargetDescription.QuestTag);
 		}
 		if (ActiveTag) return;
+		
 		//正常的任务推进
 		for (auto &Target : QuestPtr->Targets)
 		{

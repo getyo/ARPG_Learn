@@ -28,7 +28,6 @@ public:
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	FDataTableRowHandle ItemInfoHandle;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	UGeneralItemInstance * ItemInstance;
 	
 	

@@ -27,13 +27,13 @@ public:
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Quest")
 	FGameplayTag QuestIdentifyTag;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")
+	TMap<FGameplayTag,FS_ActorHoldQuestTargets> RelativeQuestMap;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable,Category = "Quest")
 	void SendTargetFinish(const FGameplayTag& ActionTag, int Cnt, AController * TargetInstigator);
-	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")
-	TMap<FGameplayTag,FS_ActorHoldQuestTargets> RelativeQuestMap;
 
 private:
 	AThirdPersonPlayerController * PlayerController = nullptr;

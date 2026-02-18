@@ -9,8 +9,6 @@ UGeneralItemInstance::UGeneralItemInstance()
 
 void UGeneralItemInstance::Initialize(FS_GeneralItemInfo* ItemInfo)
 {
-	ItemTag = ItemInfo->ItemTag;
-	ItemName = ItemInfo->ItemName;
 	DisplayName = ItemInfo->DisplayName;
 	OwnerActor = ItemInfo->OwnerActor;
 	Icon = ItemInfo->Icon;

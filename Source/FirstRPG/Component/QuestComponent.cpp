@@ -36,6 +36,7 @@ void UQuestComponent::SendTargetFinish(const FGameplayTag& ActionTag, int Cnt, A
         UGameInstance* GI = GetWorld()->GetGameInstance();
         QuestSubsystem= GI->GetSubsystem<UQuestionSubsystem>();
     }
+    
     for (auto &Pair : RelativeQuestMap)
     {
         for (auto &Target : Pair.Value.Targets)

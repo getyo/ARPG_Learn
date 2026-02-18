@@ -11,8 +11,6 @@ struct FS_GeneralItemInfo :public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
-	FGameplayTag ItemTag;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	FString ItemName;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	FString DisplayName;
@@ -39,9 +37,6 @@ public:
 	UGeneralItemInstance();
 	
 protected:
-	//Tag用作用户的数据驱动保留，如在任务系统中设置相关物品等，程序内部不使用
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
-	FGameplayTag ItemTag;
 	//Name准确来说应该是物品类型，因为一把剑的类，可以有多个对象，但是名字都是剑
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
 	FString ItemName;
@@ -69,15 +64,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Item")
 	inline FString GetDisplayName() const{return DisplayName;}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Item")
-	inline FGameplayTag GetItemTag() const{return ItemTag;}
 	inline UStaticMesh*GetStMesh() const{return StMesh;}
 	inline USkeletalMesh*GetSkMesh() const{return SkMesh;}
 	inline int32 GetTotalCnt() const{return TotalCnt;}
 	inline bool CanBeStacked() const{return _CanBeStacked;}
 	inline FString GetItemInfo() const
 	{
-		FString ItemInfo = FString::Printf(TEXT("ItemName:%s , DisplayName:%s, ItemTag:%s"),
-		*ItemID,*DisplayName,*ItemTag.ToString());
+		FString ItemInfo = FString::Printf(TEXT("ItemName:%s , DisplayName:%s"),
+		*ItemID,*DisplayName);
 		return ItemInfo;
 	}
 	virtual void Initialize(FS_GeneralItemInfo *ItemInfo);
