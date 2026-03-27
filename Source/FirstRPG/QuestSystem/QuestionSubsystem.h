@@ -15,7 +15,7 @@ struct FS_QuestTarget
 {	
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int StageInt;
+	int StageInt = - 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString TargetName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
@@ -49,13 +49,13 @@ struct FS_PlayerHoldTarget
 {	
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int StageInt;
+	int StageInt = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString TargetName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString TargetDescription;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool IsCompleted;
+	bool IsCompleted = false;
 };
 
 //玩家控制器持有的，真的的在玩家那里记录游戏任务进度的类型
@@ -64,7 +64,7 @@ struct FS_PlayerQuestHandler
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool IsFinished;
+	bool IsFinished = false;
 	//只保存当前进度的目标
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FS_PlayerHoldTarget CurrentTarget;
@@ -76,7 +76,7 @@ struct FS_ActorHoldTarget
 {	
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int StageInt;
+	int StageInt = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FGameplayTag ActionTag;
 };

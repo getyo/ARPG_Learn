@@ -25,4 +25,5 @@ public:
 #if !UE_BUILD_SHIPPING
 	#define CPP_LOG(Verbosity,Msg) \
 	UDebug::InternalLog(GetName(), FString(__FUNCTION__), Verbosity, Msg)
+#define ASSERT(Expr) checkf(Expr, TEXT("ASSERT FAILED:Class: %s,Function:%s,"),*GetName(),*FString(__FUNCTION__))
 #endif

@@ -20,9 +20,9 @@ inline FColor GetColor(DebugVerbosity Verbosity)
 {
 	switch (Verbosity)
 	{
-	case DebugVerbosity::Verbose: return FColor::Green;
-	case ELogVerbosity::Warning: return FColor::Yellow;
-	case ELogVerbosity::Error: return FColor::Red;
+	case Verbose: return FColor::Green;
+	case Warning: return FColor::Yellow;
+	case Error: return FColor::Red;
 	default: return FColor::Blue;
 	}
 }

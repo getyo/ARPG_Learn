@@ -16,6 +16,7 @@ void UGeneralItemInstance::Initialize(FS_GeneralItemInfo* ItemInfo)
 	SkMesh = ItemInfo->SkMesh;
 	TotalCnt += ItemInfo->PickUpCnt;
 	_CanBeStacked = ItemInfo->CanBeStacked;
+	_BPClassToSpawn = ItemInfo->BPClassToSpawn;
 }
 
 void UGeneralItemInstance::AddCnt(int Cnt)

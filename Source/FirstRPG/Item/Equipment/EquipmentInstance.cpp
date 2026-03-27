@@ -9,5 +9,6 @@ void UEquipmentInstance::Initialize(FS_GeneralItemInfo * ItemInfo)
 	EquipmentCategory = EquipmentInfo->EquipmentCategory;
 	ATKorDFS = EquipmentInfo->ATKorDFS;
 	LeverRestriction = EquipmentInfo->LeverRestriction;
-	SocketName = EquipmentInfo->SocketName;
+	EquippedSocketName = EquipmentInfo->EquippedSocketName;
+	ArmedSocketName = EquipmentInfo->ArmedSocketName;
 }

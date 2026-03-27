@@ -28,7 +28,9 @@ struct FS_EquippableItemInfo :public FS_GeneralItemInfo
 	int LeverRestriction = 0;
 	//只有当Item为静态网格时这个变量才生效，用于指定装备在角色身上的位置
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "EquipmentParas")
-	FString SocketName;
+	FString EquippedSocketName;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "EquipmentParas")
+	FString ArmedSocketName;
 };
 
 
@@ -45,11 +47,14 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "EquipmentParas")
 	int LeverRestriction = -1;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "EquipmentParas")
-	FString SocketName;
+	FString EquippedSocketName;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "EquipmentParas")
+	FString ArmedSocketName;
 public:
 	virtual void Initialize(FS_GeneralItemInfo* ItemInfo) override ;
 	E_EquipmentCategory GetCategory() const {return EquipmentCategory;}
 	float GetATKorDFS() const { return ATKorDFS; }
 	int32 GetLevelRestriction() const { return LeverRestriction; }
-	FString GetSocketName() const { return SocketName; }
+	FString GetEquippedSocketName() const { return EquippedSocketName; }
+	FString GetArmedSocketName() const { return ArmedSocketName; }
 };

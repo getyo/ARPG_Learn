@@ -17,15 +17,17 @@ struct FS_GeneralItemInfo :public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	UTexture2D* Icon = nullptr;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
-	UStaticMesh* StMesh;
+	UStaticMesh* StMesh = nullptr;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
-	USkeletalMesh* SkMesh;
+	USkeletalMesh* SkMesh = nullptr;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	int32 PickUpCnt = 1;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	AActor* OwnerActor = nullptr;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	bool CanBeStacked = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
+	TSubclassOf<class AGeneralItemActor> BPClassToSpawn = nullptr;
 };
 
 
@@ -56,6 +58,8 @@ protected:
 	int32 TotalCnt = 0;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
 	bool _CanBeStacked = false;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
+	TSubclassOf<class AGeneralItemActor> _BPClassToSpawn = nullptr;
 public:	
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Item")
 	inline FString GetItemID() const{return ItemID;}
@@ -73,6 +77,10 @@ public:
 		FString ItemInfo = FString::Printf(TEXT("ItemName:%s , DisplayName:%s"),
 		*ItemID,*DisplayName);
 		return ItemInfo;
+	}
+	inline TSubclassOf<class AGeneralItemActor> GetBPClassToSpawn() const
+	{
+		return _BPClassToSpawn;
 	}
 	virtual void Initialize(FS_GeneralItemInfo *ItemInfo);
 	UFUNCTION(BlueprintCallable,Category = "Item")
