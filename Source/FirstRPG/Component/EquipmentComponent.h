@@ -70,7 +70,7 @@ public:
 	
 	//这个函数是其他四个Set装备的包装，可以根据传入的类型来调用相关Set函数
 	UFUNCTION(BlueprintCallable, Category="Equipment")
-	bool SetEquipedEquipment(UEquipmentInstance * Instance);
+	bool SetEquippedEquipment(UEquipmentInstance * Instance);
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
 	bool SetEquippedRangeWeapon(UEquipmentInstance* Instance);
@@ -120,6 +120,7 @@ private:
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
 			EquipmentObj->AttachToComponent(ParentMesh, AttachRules, FName(Instance->GetEquippedSocketName()));
 			EquipmentObj->GetStaticMeshComponent()->SetCollisionProfileName(TEXT("EquippedWeapon"));
+			EquipmentObj->SetOwner(this->GetOwner());
         
 			return EquipmentObj;
 		}
@@ -140,6 +141,7 @@ private:
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
 			EquipmentObj->AttachToComponent(ParentMesh, AttachRules, FName(Instance->GetArmedSocketName()));
 			EquipmentObj->GetStaticMeshComponent()->SetCollisionProfileName(TEXT("EquippedWeapon"));
+			EquipmentObj->SetOwner(this->GetOwner());
         
 			return EquipmentObj;
 		}

@@ -109,7 +109,7 @@ void UEquipmentComponent::RemoveMeleeWeapon()
 	EquipmentStatus.MeleeWeapon = nullptr;
 }
 
-bool UEquipmentComponent::SetEquipedEquipment(UEquipmentInstance* Instance)
+bool UEquipmentComponent::SetEquippedEquipment(UEquipmentInstance* Instance)
 {
 	switch (Instance->GetCategory())
 	{
