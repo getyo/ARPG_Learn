@@ -82,7 +82,7 @@ struct FS_ActorHoldTarget
 };
 
 
-UCLASS(BlueprintType, Blueprintable,Category = "Quest")
+UCLASS(BlueprintType, Blueprintable,Abstract,Category = "Quest")
 class FIRSTRPG_API UQuestionSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -103,7 +103,6 @@ public:
 	FS_QuestTarget GetQuestTarget(const FGameplayTag& QuestTag, int Stage);
 	UFUNCTION(BlueprintCallable,Category = "QuestTargetCondition")
 	void BroadcastFinish(FS_QuestTargetData QuestTargetData);
-
 	
 private:
 	TMap<FGameplayTag,FS_QuestInfo> _QuestInfos;
@@ -112,14 +111,6 @@ private:
 	void DeliverTargetCheck(const FS_QuestTargetData & QuestTargetDescription);
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	virtual bool ShouldCreateSubsystem(UObject* Outer) const override{
-		// 如果当前的类【正好就是】这个 C++ 类（而不是它的蓝图子类），就返回 false
-		if (GetClass() == UQuestionSubsystem::StaticClass())
-		{
-			return false;
-		}
-		return Super::ShouldCreateSubsystem(Outer);
-	}
 	AThirdPersonPlayerController * PlayerController = nullptr;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
