@@ -11,6 +11,7 @@ UENUM(NotBlueprintType)
 enum class ECharacterFaction :uint8
 {
 	PlayerFriend,
+	Neutral,
 	Enemy,
 	None
 };

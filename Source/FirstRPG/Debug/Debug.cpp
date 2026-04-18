@@ -30,7 +30,7 @@ inline FColor GetColor(DebugVerbosity Verbosity)
 void UDebug::DebugLog(UObject* WorldContextObject, FString Message,DebugVerbosity Verbosity)
 {
 #if !UE_BUILD_SHIPPING
-	GEngine->AddOnScreenDebugMessage(-1,20.f,GetColor(DebugVerbosity::Verbose),
+	GEngine->AddOnScreenDebugMessage(-1,20.f,GetColor(Verbosity),
 		FString::Printf(TEXT("Class: %s, %s"),
 		*WorldContextObject->GetName(),*Message));
 	
