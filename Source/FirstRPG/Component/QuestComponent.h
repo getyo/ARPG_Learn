@@ -23,13 +23,18 @@ public:
 	// Sets default values for this component's properties
 	UQuestComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetFocusedQuest(const FGameplayTag & QuestTag)
+	{
+		this->FocusedQuestTag = QuestTag;
+	}
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Quest")
-	FGameplayTag QuestIdentifyTag;
+	FGameplayTag QuestIdentifyTag = FGameplayTag::EmptyTag;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")
 	TMap<FGameplayTag,FS_ActorHoldQuestTargets> RelativeQuestMap;
-	
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Quest")
+	FGameplayTag FocusedQuestTag = FGameplayTag::EmptyTag;
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable,Category = "Quest")
