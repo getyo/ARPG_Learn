@@ -77,3 +77,6 @@ DerivedDataCache/*
 
 # Assert Folders
 Content/Fab/*
+
+# BaiduDisySync
+*baiduyun*
