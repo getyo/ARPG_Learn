@@ -17,7 +17,7 @@ class FIRSTRPG_API AStMeleeWeapon : public AMeleeWeapon
 	AStMeleeWeapon();
 protected:
 	virtual void BeginPlay() override;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere,Category="StaticMesh")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere,Category="Melee Weapon | StaticMesh")
 	UStaticMeshComponent* MeshComp;
 public:
 	UStaticMeshComponent* GetStaticMeshComponent() const{return MeshComp;}

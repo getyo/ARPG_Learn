@@ -85,4 +85,6 @@ public:
 	virtual void Initialize(FS_GeneralItemInfo *ItemInfo);
 	UFUNCTION(BlueprintCallable,Category = "Item")
 	void AddCnt(int Cnt);
+	UFUNCTION(BlueprintCallable,Category = "Item")
+	static UGeneralItemInstance * GeneralItemInstanceFactory(const FDataTableRowHandle &DataSource);
 };

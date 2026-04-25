@@ -24,7 +24,6 @@ public:
 	UGeneralItemInstance * GetItemInstance()const{return ItemInstance;}
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	inline void SetItemInstance(UGeneralItemInstance * Instance){ItemInstance = Instance;}
-	virtual UGeneralItemInstance * GeneralItemInstance();
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
 	FDataTableRowHandle ItemInfoHandle;

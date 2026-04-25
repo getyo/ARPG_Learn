@@ -57,4 +57,6 @@ public:
 	int32 GetLevelRestriction() const { return LeverRestriction; }
 	FString GetEquippedSocketName() const { return EquippedSocketName; }
 	FString GetArmedSocketName() const { return ArmedSocketName; }
+	UFUNCTION(BlueprintCallable,Category = "Equipment | Instance")
+	static UEquipmentInstance * EquipmentInstanceFactory(const FDataTableRowHandle &DataSource);
 };

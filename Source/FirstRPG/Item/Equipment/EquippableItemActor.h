@@ -14,5 +14,4 @@ class FIRSTRPG_API AEquippableItemActor : public AGeneralItemActor
 protected:
 	virtual void BeginPlay() override;
 public:
-	virtual UGeneralItemInstance* GeneralItemInstance() override;
 };
