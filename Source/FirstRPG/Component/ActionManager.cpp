@@ -44,8 +44,9 @@ void UActionManager::ReadActionTable() {
 		}
 	}
 	else {
-		UE_LOG(LogConfig, Error, TEXT("No Action Table!"));
+		CPP_LOG(Error,"No Action Table!");
 	}
+	ActiveActions.Empty();
 	/*
 	UE_LOG(LogTemp, Verbose, TEXT("ActionGraph rows :%d \n Row members: %d"),ActionGraph.Num(),ActionGraph[0].Row.Num());
 	for (int i = 0; i < ActionGraph.Num();++i) {
@@ -60,7 +61,13 @@ void UActionManager::ReadActionTable() {
 }
 
 
-bool UActionManager::CanExe_Implementation(const FGameplayTag &Action) {
+bool UActionManager::CanExe_Implementation(const FGameplayTag Action) {
+	if (Action == FGameplayTag::EmptyTag)
+	{
+		CPP_LOG(Error,"Action Tag is Empty!");
+		return false;
+	}
+		
 	if (!ActiveActions.Num()) {
 		ActiveActions.Add(Action);
 		return true;
@@ -77,7 +84,7 @@ bool UActionManager::CanExe_Implementation(const FGameplayTag &Action) {
 	else return false;
 }
 
-void UActionManager::EndAction(const FGameplayTag& Action)
+void UActionManager::EndAction(const FGameplayTag Action)
 {
 	if (!ActiveActions.Contains(Action))
 	{	
