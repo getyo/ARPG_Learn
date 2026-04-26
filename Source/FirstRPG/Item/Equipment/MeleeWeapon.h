@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "EquippableItemActor.h"
+#include "Weapon.h"
 #include "MeleeWeapon.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FIRSTRPG_API AMeleeWeapon : public AEquippableItemActor
+class FIRSTRPG_API AMeleeWeapon : public AWeapon
 {
 	GENERATED_BODY()
 protected:

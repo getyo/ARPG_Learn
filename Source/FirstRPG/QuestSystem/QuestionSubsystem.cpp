@@ -9,10 +9,17 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "FirstRPG/Character/Player/ThirdPersonPlayerController.h"
+#include "FirstRPG/Debug/Debug.h"
 
 void UQuestionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	if (UWorld* World = GetWorld())
+	{
+		// 重点看 EWorldType::Type 的值
+		CPP_LOG( Warning, FString::Printf(TEXT("QuestSystem Init in World: %s, Type: %d"), 
+			*World->GetName(), (int32)World->WorldType));
+	}
 	UQuestTargetCondition::InitQuestTargetCondition();
 	ReadQuestion();
 	//初始化任务目标完成事件分发器

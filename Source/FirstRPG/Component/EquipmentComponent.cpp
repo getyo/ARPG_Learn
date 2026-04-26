@@ -10,6 +10,7 @@
 #include "FirstRPG/Item/Equipment/StRangeWeapon.h"
 #include "FirstRPG/Item/Equipment/StShield.h"
 
+
 // Sets default values for this component's properties
 UEquipmentComponent::UEquipmentComponent()
 {
@@ -32,11 +33,39 @@ void UEquipmentComponent::BeginPlay()
 		CPP_LOG(Error,"Get CharacterMesh failed");
 		return;
 	}
-	CaptureComponent = Cast<USceneCaptureComponent2D>(GetOwner()->GetComponentByClass(USceneCaptureComponent2D::StaticClass()));
-	if (!CaptureComponent)
+	if (GetOwner()->ActorHasTag("Player"))
 	{
-		CPP_LOG(Error,"Get SceneCaptureCmp failed");
-		return;
+		CaptureComponent = Cast<USceneCaptureComponent2D>(GetOwner()->GetComponentByClass(USceneCaptureComponent2D::StaticClass()));
+		if (!CaptureComponent)
+		{
+			CPP_LOG(Error,"Get SceneCaptureCmp failed");
+			return;
+		}
+	}
+	
+	if (!DefaultEquipment.MeleeWeapon.IsNull())
+	{
+		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.MeleeWeapon);
+		AddEquippableItem(Instance);
+		SetEquippedMeleeWeapon(Instance);
+	}
+	if (!DefaultEquipment.RangeWeapon.IsNull())
+	{
+		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.RangeWeapon);
+		AddEquippableItem(Instance);
+		SetEquippedMeleeWeapon(Instance);
+	}
+	if (!DefaultEquipment.Shield.IsNull())
+	{
+		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.Shield);
+		AddEquippableItem(Instance);
+		SetEquippedMeleeWeapon(Instance);
+	}
+	if (!DefaultEquipment.Armor.IsNull())
+	{
+		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.Armor);
+		AddEquippableItem(Instance);
+		SetEquippedMeleeWeapon(Instance);
 	}
 }
 
@@ -56,6 +85,11 @@ void UEquipmentComponent::AddEquippableItem(AEquippableItemActor* EquippableItem
 	{
 		CPP_LOG(Warning,FString::Printf(TEXT("Item is not equipment:%s"),*EquippableItem->GetItemInfo()));
 	}
+	AddEquippableItem(EquipmentInst);
+}
+
+void UEquipmentComponent::AddEquippableItem(UEquipmentInstance* EquipmentInst)
+{
 	auto EquipmentPtr = EquipmentName2Obj.Find(EquipmentInst->GetItemName());
 	if (!EquipmentPtr)
 	{
@@ -85,15 +119,20 @@ bool UEquipmentComponent::SetEquippedMeleeWeapon(UEquipmentInstance * Instance)
 		return false;
 	}
 	
-	if (EquipmentStatus.MeleeWeapon)
+	if (CurEquipmentRef.MeleeWeapon)
 	{
 		RemoveMeleeWeapon();
 	}
 	if (Instance->GetStMesh())
 	{
 		//生成并附加到角色的网格体插槽上
-		EquipmentStatus.MeleeWeapon = SpawnAndAttach<AStMeleeWeapon>(Instance,OwnerMesh);
-		CaptureComponent->ShowOnlyActors.Add(EquipmentStatus.MeleeWeapon);
+		CurEquipmentRef.MeleeWeapon = SpawnAtEquippedSocket<AStMeleeWeapon>(Instance,OwnerMesh);
+		if (!CurEquipmentRef.MeleeWeapon)
+		{
+			CPP_LOG(Error,FString::Printf(TEXT("MeleeWeapon spawn failed,Item Name : %s"),*Instance->GetItemName()));
+			return false;
+		}
+			
 		return true;
 	}
 	return false;
@@ -101,12 +140,15 @@ bool UEquipmentComponent::SetEquippedMeleeWeapon(UEquipmentInstance * Instance)
 
 void UEquipmentComponent::RemoveMeleeWeapon()
 {
-	CaptureComponent->ShowOnlyActors.Remove(EquipmentStatus.MeleeWeapon);
-	EquipmentStatus.MeleeWeapon->Destroy(true);
-	EquipmentStatus.MeleeWeapon = nullptr;
+	if (GetOwner()->ActorHasTag("Player"))
+		CaptureComponent->ShowOnlyActors.Remove(CurEquipmentRef.MeleeWeapon);
+	if (UsingWeapon == CurEquipmentRef.MeleeWeapon)
+		UsingWeapon = nullptr;
+	CurEquipmentRef.MeleeWeapon->Destroy(true);
+	CurEquipmentRef.MeleeWeapon = nullptr;
 }
 
-bool UEquipmentComponent::SetEquipedEquipment(UEquipmentInstance* Instance)
+bool UEquipmentComponent::SetEquippedEquipment(UEquipmentInstance* Instance)
 {
 	switch (Instance->GetCategory())
 	{
@@ -147,17 +189,16 @@ bool UEquipmentComponent::SetEquippedRangeWeapon(UEquipmentInstance* Instance)
 		return false;
 	}
 	
-	if (EquipmentStatus.RangeWeapon)
+	if (CurEquipmentRef.RangeWeapon)
 	{
 		RemoveRangeWeapon();
 	}
 	if (Instance->GetStMesh())
 	{
-		EquipmentStatus.RangeWeapon = SpawnAndAttach<AStRangeWeapon>(Instance, OwnerMesh);
+		CurEquipmentRef.RangeWeapon = SpawnAtEquippedSocket<AStRangeWeapon>(Instance, OwnerMesh);
        
-		if (EquipmentStatus.RangeWeapon)
-		{
-			CaptureComponent->ShowOnlyActors.Add(EquipmentStatus.RangeWeapon);
+		if (CurEquipmentRef.RangeWeapon)
+		{	
 			return true;
 		}
 	}
@@ -166,9 +207,12 @@ bool UEquipmentComponent::SetEquippedRangeWeapon(UEquipmentInstance* Instance)
 
 void UEquipmentComponent::RemoveRangeWeapon()
 {
-	CaptureComponent->ShowOnlyActors.Remove(EquipmentStatus.RangeWeapon);
-	EquipmentStatus.RangeWeapon->Destroy(true);
-	EquipmentStatus.RangeWeapon = nullptr;
+	if (GetOwner()->ActorHasTag("Player"))
+		CaptureComponent->ShowOnlyActors.Remove(CurEquipmentRef.RangeWeapon);
+	if (UsingWeapon == CurEquipmentRef.RangeWeapon) 
+		UsingWeapon = nullptr;
+	CurEquipmentRef.RangeWeapon->Destroy(true);
+	CurEquipmentRef.RangeWeapon = nullptr;
 }
 
 bool UEquipmentComponent::SetEquippedShield(UEquipmentInstance* Instance)
@@ -185,7 +229,7 @@ bool UEquipmentComponent::SetEquippedShield(UEquipmentInstance* Instance)
 	}
 
 	// 1. 销毁旧盾牌
-	if (EquipmentStatus.Shield)
+	if (CurEquipmentRef.Shield)
 	{
 		RemoveShield();
 	}
@@ -193,11 +237,10 @@ bool UEquipmentComponent::SetEquippedShield(UEquipmentInstance* Instance)
 	// 2. 生成新盾牌
 	if (Instance->GetStMesh())
 	{
-		EquipmentStatus.Shield = SpawnAndAttach<AStShield>(Instance, OwnerMesh);
+		CurEquipmentRef.Shield = SpawnAtEquippedSocket<AStShield>(Instance, OwnerMesh);
        
-		if (EquipmentStatus.Shield)
+		if (CurEquipmentRef.Shield)
 		{
-			CaptureComponent->ShowOnlyActors.Add(EquipmentStatus.Shield);
 			return true;
 		}
 	}
@@ -206,10 +249,12 @@ bool UEquipmentComponent::SetEquippedShield(UEquipmentInstance* Instance)
 
 void UEquipmentComponent::RemoveShield()
 {
-	CaptureComponent->ShowOnlyActors.Remove(EquipmentStatus.Shield);
-	EquipmentStatus.Shield->Destroy(true);
-	EquipmentStatus.Shield = nullptr;
+	if (GetOwner()->ActorHasTag("Player"))
+		CaptureComponent->ShowOnlyActors.Remove(CurEquipmentRef.Shield);
+	CurEquipmentRef.Shield->Destroy(true);
+	CurEquipmentRef.Shield = nullptr;
 }
+
 
 bool UEquipmentComponent::SetEquippedArmor(UEquipmentInstance* Instance)
 {
@@ -225,7 +270,7 @@ bool UEquipmentComponent::SetEquippedArmor(UEquipmentInstance* Instance)
 	}
 
 	
-	if (EquipmentStatus.Armor)
+	if (CurEquipmentRef.Armor)
 	{
 		RemoveShield();
 	}
@@ -249,7 +294,8 @@ bool UEquipmentComponent::SetEquippedArmor(UEquipmentInstance* Instance)
 			SkOwnerMesh->SetHiddenInGame(true);
 			SkOwnerMesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 			
-			CaptureComponent->ShowOnlyActors.Add(Armor);
+			if (GetOwner()->ActorHasTag("Player"))
+				CaptureComponent->ShowOnlyActors.Add(Armor);
 			return true;
 		}
 		return false;
@@ -257,7 +303,131 @@ bool UEquipmentComponent::SetEquippedArmor(UEquipmentInstance* Instance)
 	return false;
 }
 
+void UEquipmentComponent::RemoveArmor()
+{
+	if (GetOwner()->ActorHasTag("Player"))
+		CaptureComponent->ShowOnlyActors.Remove(CurEquipmentRef.Armor);
+	CurEquipmentRef.Armor->Destroy(true);
+	CurEquipmentRef.Armor = nullptr;
+}
+
 TArray<UEquipmentInstance*> UEquipmentComponent::GetEquippableItems()
 {
 	return EquippableItems;
 }
+
+bool UEquipmentComponent::DrawWeapon(E_WeaponKind WeaponKind)
+{
+	switch (WeaponKind)
+	{
+	case E_WeaponKind::MeleeWeapon:
+		{
+			if (!CurEquipmentRef.MeleeWeapon) return false;
+			auto Inst = Cast<UEquipmentInstance>(CurEquipmentRef.MeleeWeapon->GetItemInstance());
+			return ChangeUsingWeapon(Inst);
+		}
+	case E_WeaponKind::RangeWeapon:
+		{
+			if (!CurEquipmentRef.RangeWeapon) return false;
+			auto Inst = Cast<UEquipmentInstance>(CurEquipmentRef.RangeWeapon->GetItemInstance());
+			return ChangeUsingWeapon(Inst);
+		}
+	default:break;
+	}
+	return false;
+}
+
+void UEquipmentComponent::SheatheWeapon()
+{
+	if (UsingWeapon) DestroyUsingWeapon();
+}
+
+bool UEquipmentComponent::ChangeUsingWeapon(UEquipmentInstance* Instance)
+{
+	//如果当前武装着武器，先卸下武器
+	if (UsingWeapon) DestroyUsingWeapon();
+	ASSERT(UsingWeapon == nullptr);
+	//在武装位置生成武器
+	switch (Instance->GetCategory())
+	{
+	case E_EquipmentCategory::MeleeWeapon:
+		{
+			RemoveMeleeWeapon();
+			CurEquipmentRef.MeleeWeapon = SpawnAtArmedSocket<AStMeleeWeapon>(Instance, OwnerMesh);
+			UsingWeapon = CurEquipmentRef.MeleeWeapon;
+			return true;
+		}
+	case E_EquipmentCategory::RangeWeapon:
+		{
+			RemoveRangeWeapon();
+			CurEquipmentRef.RangeWeapon = SpawnAtArmedSocket<AStRangeWeapon>(Instance, OwnerMesh);
+			UsingWeapon = CurEquipmentRef.RangeWeapon;
+			return true;
+		}
+	default:break;
+	}
+	return false;
+}
+
+void UEquipmentComponent::DestroyUsingWeapon()
+{
+	auto UsingWeaponInst = Cast<UEquipmentInstance>(UsingWeapon->GetItemInstance());
+	switch (UsingWeaponInst->GetCategory())
+	{
+	case E_EquipmentCategory::MeleeWeapon:
+		{
+			//销毁当前武装的近战武器
+			auto MeleeWeaponInst = Cast<UEquipmentInstance>(CurEquipmentRef.MeleeWeapon->GetItemInstance());
+			RemoveMeleeWeapon();
+			//在装备位置重新生成近战武器
+			CurEquipmentRef.MeleeWeapon = SpawnAtEquippedSocket<AStMeleeWeapon>(MeleeWeaponInst,OwnerMesh);
+			break;
+		}
+	case E_EquipmentCategory::RangeWeapon:
+		{
+			auto RangeWeaponInst = Cast<UEquipmentInstance>(CurEquipmentRef.RangeWeapon->GetItemInstance());
+			//销毁当前武装的远程武器
+			RemoveRangeWeapon();
+			//在装备位置重新生成远程武器
+			CurEquipmentRef.RangeWeapon = SpawnAtEquippedSocket<AStRangeWeapon>(RangeWeaponInst,OwnerMesh);
+			break;
+		}
+	default:break;
+	}
+}
+
+
+E_WeaponKind UEquipmentComponent::GetUsingWeaponKind()
+{
+	if (!UsingWeapon) return E_WeaponKind::None;
+	if (UsingWeapon->IsA(AMeleeWeapon::StaticClass()))
+		return E_WeaponKind::MeleeWeapon;
+	else return E_WeaponKind::RangeWeapon;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

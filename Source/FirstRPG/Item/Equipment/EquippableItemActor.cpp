@@ -8,9 +8,12 @@
 void AEquippableItemActor::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-UGeneralItemInstance* AEquippableItemActor::GeneralItemInstance()
-{
-	return NewObject<UEquipmentInstance>(this);
+	if (!ItemInstance && IsA(AEquippableItemActor::StaticClass()))
+	{
+		ItemInstance = UEquipmentInstance::EquipmentInstanceFactory(ItemInfoHandle);
+		if (!ItemInstance)
+		{
+			CPP_LOG(Warning,"Cannot get valid ItemInstance");
+		}
+	}
 }
