@@ -1,4 +1,6 @@
 ﻿#include "Debug.h"
+
+#include "Engine/Engine.h"
 #include "GenericPlatform/GenericPlatformStackWalk.h"
 
 FString GetCleanStackTrace(int32 SkipLines = 2)
