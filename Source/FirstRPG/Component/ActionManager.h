@@ -32,9 +32,11 @@ public:
 
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "ActionManager")
 	bool CanExe(const FGameplayTag ActionName);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category = "ActionManager")
 	FORCEINLINE void EndAction(const FGameplayTag Action);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,BlueprintPure,Category = "ActionManager")
+	FORCEINLINE bool IsActiveAction(const FGameplayTag Action);
+	UFUNCTION(BlueprintCallable,Category = "ActionManager")
 	void PrintAllActiveAction();
 
 

@@ -94,6 +94,11 @@ void UActionManager::EndAction(const FGameplayTag Action)
 	ActiveActions.Remove(Action);
 }
 
+bool UActionManager::IsActiveAction(const FGameplayTag Action)
+{
+	return ActiveActions.Contains(Action);
+}
+
 void UActionManager::PrintAllActiveAction()
 {
 	FString AllActiveActions = "";
