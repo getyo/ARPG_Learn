@@ -84,43 +84,60 @@ public:
 	inline void AddEquippableItem(UEquipmentInstance* EquipmentInst);
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
-	//注意当你装备近战武器时，默认会把它设置为UsingWeapon
-	bool SetEquippedMeleeWeapon(UEquipmentInstance * Instance);
-	UFUNCTION(BlueprintCallable, Category="Equipment")
-	inline void RemoveMeleeWeapon();
-	
 	//这个函数是其他四个Set装备的包装，可以根据传入的类型来调用相关Set函数
-	UFUNCTION(BlueprintCallable, Category="Equipment")
 	bool SetEquippedEquipment(UEquipmentInstance * Instance);
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//在EquippedSlot生成近战武器网格体
+	//注意当你装备近战武器时，默认会把它设置为UsingWeapon
+	bool SetEquippedMeleeWeapon(UEquipmentInstance * Instance);
+	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁当前近战武器网格体实例（无论武装/装备状态），不对Inst进行销毁
+	inline void RemoveMeleeWeapon();
+	
+	
+	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//在EquippedSlot生成远程武器网格体
 	bool SetEquippedRangeWeapon(UEquipmentInstance* Instance);
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁当前远程武器网格体实例（无论武装/装备状态），不对Inst进行销毁
 	inline void RemoveRangeWeapon();
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//在EquippedSlot生成盾牌网格体
 	bool SetEquippedShield(UEquipmentInstance* Instance);
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁当前盾牌网格体实例（无论武装/装备状态），不对Inst进行销毁
 	inline void RemoveShield();
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁当前盔甲网格体实例，不对Inst进行销毁
 	inline void RemoveArmor();
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//生成盔甲网格体
 	bool SetEquippedArmor(UEquipmentInstance * Instance);
 	
 	UFUNCTION(BlueprintCallable,BlueprintPure, Category="Equipment")
 	TArray<UEquipmentInstance*> GetEquippableItems();
 	
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁当前装备武器并重新生成在武装位置上，与DestroyUsingWeapon作用相反
 	bool DrawWeapon(E_WeaponKind WeaponKind);
 	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//销毁EquippedSlot盾牌，在ArmedSlot重新生成网格体
+	bool DrawShield();
+	UFUNCTION(BlueprintCallable, Category="Equipment")
+	//DestroyUsingWeapon的对外封装
 	void SheatheWeapon();
+	UFUNCTION(BlueprintCallable, Category="Equipment")
+	void SheatheShield();
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category="Equipment")
 	FORCEINLINE E_WeaponKind GetUsingWeaponKind();
 	
+	//DrawWeapon的下游，负责根据传入的Inst进行实际网格体生成和销毁
 	bool ChangeUsingWeapon(UEquipmentInstance * Instance);
-	//销毁当前武装武器并且重新将其生成在装备位置
+	//销毁当前武装武器并且重新将其生成在装备位置，与DrawWeapon作用相反
 	void DestroyUsingWeapon();
 
 	

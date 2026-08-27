@@ -53,19 +53,19 @@ void UEquipmentComponent::BeginPlay()
 	{
 		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.RangeWeapon);
 		AddEquippableItem(Instance);
-		SetEquippedMeleeWeapon(Instance);
+		SetEquippedRangeWeapon(Instance);
 	}
 	if (!DefaultEquipment.Shield.IsNull())
 	{
 		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.Shield);
 		AddEquippableItem(Instance);
-		SetEquippedMeleeWeapon(Instance);
+		SetEquippedShield(Instance);
 	}
 	if (!DefaultEquipment.Armor.IsNull())
 	{
 		auto Instance = UEquipmentInstance::EquipmentInstanceFactory(DefaultEquipment.Armor);
 		AddEquippableItem(Instance);
-		SetEquippedMeleeWeapon(Instance);
+		SetEquippedArmor(Instance);
 	}
 }
 
@@ -323,8 +323,8 @@ bool UEquipmentComponent::DrawWeapon(E_WeaponKind WeaponKind)
 	case E_WeaponKind::MeleeWeapon:
 		{
 			if (!CurEquipmentRef.MeleeWeapon) return false;
-			auto Inst = Cast<UEquipmentInstance>(CurEquipmentRef.MeleeWeapon->GetItemInstance());
-			return ChangeUsingWeapon(Inst);
+			auto MeleeInst = Cast<UEquipmentInstance>(CurEquipmentRef.MeleeWeapon->GetItemInstance());
+			return ChangeUsingWeapon(MeleeInst);
 		}
 	case E_WeaponKind::RangeWeapon:
 		{
@@ -337,9 +337,27 @@ bool UEquipmentComponent::DrawWeapon(E_WeaponKind WeaponKind)
 	return false;
 }
 
+bool UEquipmentComponent::DrawShield()
+{
+	if (!CurEquipmentRef.Shield) return false;
+	auto ShieldInst = Cast<UEquipmentInstance>(CurEquipmentRef.Shield->GetItemInstance());
+	RemoveShield();
+	CurEquipmentRef.Shield = SpawnAtArmedSocket<AStShield>(ShieldInst, OwnerMesh);
+	return true;
+}
+
 void UEquipmentComponent::SheatheWeapon()
 {
 	if (UsingWeapon) DestroyUsingWeapon();
+}
+
+void UEquipmentComponent::SheatheShield()
+{
+	if (!CurEquipmentRef.Shield) return;
+	auto ShieldInst = Cast<UEquipmentInstance>(CurEquipmentRef.Shield->GetItemInstance());
+	RemoveShield();
+	//在装备位置重新生成近战武器
+	CurEquipmentRef.Shield = SpawnAtEquippedSocket<AStShield>(ShieldInst,OwnerMesh);
 }
 
 bool UEquipmentComponent::ChangeUsingWeapon(UEquipmentInstance* Instance)
