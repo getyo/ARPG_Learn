@@ -5,27 +5,25 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
+#include "FirstRPG/Character/CharacterFactionType.h"
+#include "FirstRPG/SaveSystem/SaveGameInterface.h"
 #include "GeneralCharacter.generated.h"
 
-UENUM(NotBlueprintType)
-enum class ECharacterFaction :uint8
-{
-	PlayerFriend,
-	Neutral,
-	Enemy,
-	None
-};
-
 UCLASS(Abstract, Blueprintable,BlueprintType)
-class FIRSTRPG_API AGeneralCharacter : public ACharacter
+class FIRSTRPG_API AGeneralCharacter : public ACharacter,public ICharacterSaveInterface
 {
 	GENERATED_BODY()
 
 public:
 	AGeneralCharacter();
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PreDuplicate(FObjectDuplicationParameters& DupParams) override;
+	void RegisterCharacter();
+	void UnRegisterCharacter();
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
 	FGameplayTag CharacterTag;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
@@ -35,6 +33,7 @@ protected:
 	FString DisplayName;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character")
 	ECharacterFaction CharacterFaction = ECharacterFaction::None;
+	bool IsStatic = true;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,6 +50,12 @@ public:
 	inline FGameplayTag GetCharacterTag() const{return CharacterTag;}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline ECharacterFaction GetCharacterFaction() const{return CharacterFaction;}
+	UFUNCTION(BlueprintCallable, Category = "Character")
+	static AGeneralCharacter* SpawnCharacter(UObject* WorldContextObject, TSubclassOf<AGeneralCharacter> CharacterClass,
+	                                         FTransform SpawnTransform);
+	virtual void SaveCharacterData_Implementation(FCharacterSaveData& Data) override;
+	virtual void LoadCharacterData_Implementation(const FCharacterSaveData& Data) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
 	FString CharacterID = "";
 };

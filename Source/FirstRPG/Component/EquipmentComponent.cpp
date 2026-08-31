@@ -95,6 +95,7 @@ void UEquipmentComponent::AddEquippableItem(UEquipmentInstance* EquipmentInst)
 	{
 		EquipmentName2Obj.Add(EquipmentInst->GetItemName(), EquipmentInst);
 		EquippableItems.Add(EquipmentInst);
+		EquipmentInst->Holder = GetOwner();
 	}
 	else if (EquipmentInst->CanBeStacked())
 	{
@@ -412,6 +413,16 @@ void UEquipmentComponent::DestroyUsingWeapon()
 		}
 	default:break;
 	}
+}
+
+void UEquipmentComponent::ClearBag()
+{
+	if (CurEquipmentRef.MeleeWeapon) RemoveMeleeWeapon();
+	if (CurEquipmentRef.RangeWeapon) RemoveRangeWeapon();
+	if (CurEquipmentRef.Shield) RemoveShield();
+	if (CurEquipmentRef.Armor) RemoveArmor();
+	EquippableItems.Reset();
+	EquipmentName2Obj.Reset();
 }
 
 

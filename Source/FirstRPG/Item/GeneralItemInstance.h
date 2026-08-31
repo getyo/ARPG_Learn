@@ -60,7 +60,12 @@ protected:
 	bool _CanBeStacked = false;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
 	TSubclassOf<class AGeneralItemActor> _BPClassToSpawn = nullptr;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Item")
+	FDataTableRowHandle DataTableRow;
 public:	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Item")
+	AActor * Holder = nullptr;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Item")
 	inline FString GetItemID() const{return ItemID;}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Item")
@@ -82,6 +87,7 @@ public:
 	{
 		return _BPClassToSpawn;
 	}
+	inline FDataTableRowHandle GetDataTableRow() const{return DataTableRow;}
 	virtual void Initialize(FS_GeneralItemInfo *ItemInfo);
 	UFUNCTION(BlueprintCallable,Category = "Item")
 	void AddCnt(int Cnt);

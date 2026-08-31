@@ -4,48 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "FirstRPG/Item//Equipment/MeleeWeapon.h"
-#include "FirstRPG/Item//Equipment/RangeWeapon.h"
-#include "FirstRPG/Item//Equipment/Armor.h"
-#include "FirstRPG/Item//Equipment/Shield.h"
+#include "FirstRPG/Item/Equipment/EquipmentDataType.h"
+#include "FirstRPG/Item/Equipment/EquipmentInstance.h"
+#include "FirstRPG/Item/Equipment/Weapon.h"
+#include "FirstRPG/Item/Equipment/Armor.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "EquipmentComponent.generated.h"
 
-USTRUCT(Blueprintable,BlueprintType)
-struct FS_EquipmentRef
-{
-	GENERATED_BODY()
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	AMeleeWeapon * MeleeWeapon = nullptr;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	ARangeWeapon * RangeWeapon = nullptr;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	AShield * Shield = nullptr;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	AArmor * Armor = nullptr;
-};
-
-USTRUCT(Blueprintable,BlueprintType)
-struct FS_DefaultEquipmentStatus
-{
-	GENERATED_BODY()
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	FDataTableRowHandle MeleeWeapon;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	FDataTableRowHandle RangeWeapon;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	FDataTableRowHandle Shield;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equipment")
-	FDataTableRowHandle Armor;
-};
-
-UENUM(BlueprintType)
-enum class E_WeaponKind : uint8
-{
-	None,
-	MeleeWeapon,
-	RangeWeapon
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) ,Blueprintable)
 class FIRSTRPG_API UEquipmentComponent : public UActorComponent
@@ -139,8 +104,8 @@ public:
 	bool ChangeUsingWeapon(UEquipmentInstance * Instance);
 	//销毁当前武装武器并且重新将其生成在装备位置，与DrawWeapon作用相反
 	void DestroyUsingWeapon();
-
-	
+	FS_EquipmentRef GetCurEquipmentStatus(){ return CurEquipmentRef;}
+	void ClearBag();
 	
 private:
 	template<typename T>
@@ -149,12 +114,9 @@ private:
 		if (!Instance || !ParentMesh) return nullptr;
 		FTransform SlotTransform = ParentMesh->GetSocketTransform(FName(Instance->GetEquippedSocketName()), RTS_World);
 		
-		T* EquipmentObj = ParentMesh->GetWorld()->SpawnActorDeferred<T>(Instance->GetBPClassToSpawn(), SlotTransform);
+		T* EquipmentObj = Cast<T>(AGeneralItemActor::SpawnItem(ParentMesh->GetWorld(), Instance->GetBPClassToSpawn(), Instance, SlotTransform));
 		if (EquipmentObj)
 		{
-			EquipmentObj->SetItemInstance(Instance);
-			EquipmentObj->FinishSpawning(SlotTransform);
-			
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
 			EquipmentObj->AttachToComponent(ParentMesh, AttachRules, FName(Instance->GetEquippedSocketName()));
 			EquipmentObj->GetStaticMeshComponent()->SetCollisionProfileName(TEXT("EquippedWeapon"));
@@ -171,12 +133,9 @@ private:
 		if (!Instance || !ParentMesh) return nullptr;
 		FTransform SlotTransform = ParentMesh->GetSocketTransform(FName(Instance->GetArmedSocketName()), RTS_World);
 		
-		T* EquipmentObj = ParentMesh->GetWorld()->SpawnActorDeferred<T>(Instance->GetBPClassToSpawn(), SlotTransform);
+		T* EquipmentObj = Cast<T>(AGeneralItemActor::SpawnItem(ParentMesh->GetWorld(), Instance->GetBPClassToSpawn(), Instance, SlotTransform));
 		if (EquipmentObj)
 		{
-			EquipmentObj->SetItemInstance(Instance);
-			EquipmentObj->FinishSpawning(SlotTransform);
-			
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
 			EquipmentObj->AttachToComponent(ParentMesh, AttachRules, FName(Instance->GetArmedSocketName()));
 			EquipmentObj->GetStaticMeshComponent()->SetCollisionProfileName(TEXT("EquippedWeapon"));

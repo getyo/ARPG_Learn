@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FirstRPG/Item//GeneralItemActor.h"
+#include "FirstRPG/Item/GeneralItemInstance.h"
 #include "EquipmentInstance.generated.h"
 
 UENUM(BlueprintType)

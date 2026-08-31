@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "FirstRPG/QuestSystem//QuestionSubsystem.h"
+#include "FirstRPG/SaveSystem/SaveGameInterface.h"
 #include "ThirdPersonPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable,BlueprintType)
-class FIRSTRPG_API AThirdPersonPlayerController : public APlayerController
+class FIRSTRPG_API AThirdPersonPlayerController : public APlayerController,public IPlayerSaveInterface
 {
 	GENERATED_BODY()
 public:
@@ -44,6 +45,8 @@ public:
 	bool SetFocusedQuest(const FGameplayTag& QuestTag);
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "Quest")
 	void QuestFinished(const FGameplayTag& QuestTag);
+	virtual void SavePlayerData_Implementation(FPlayerSaveData& Data) override;
+	virtual void LoadPlayerData_Implementation(const FPlayerSaveData& Data) override;
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Quest")

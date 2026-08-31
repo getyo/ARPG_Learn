@@ -26,7 +26,8 @@ public:
 	virtual void Deinitialize() override;
 	
 	UFUNCTION(BlueprintCallable,Category= "Character Mannger")
-	FString GenerateID(AGeneralCharacter * Character);
+	void Register(AGeneralCharacter* Character);
+	void UnRegister(AGeneralCharacter* Character);
 	
 	UFUNCTION(BlueprintCallable,BlueprintPure,Category= "Character Mannger")
 	inline FString GetCharacterID(const FString& CharacterName) const

@@ -47,11 +47,10 @@ FString IncrementSuffix(const FString& InName)
 	}
 }
 
-FString UCharacterManagerSubsystem::GenerateID(AGeneralCharacter *Character)
+void UCharacterManagerSubsystem::Register(AGeneralCharacter* Character)
 {
 	FScopeLock Lock(&IDMutex);
-	FGuid Guid = FGuid::NewGuid();
-	FString ID = Guid.ToString();
+	FString ID = Character->GetCharacterID();
 	ID2CharcCharacterMap.Add(ID,Character);
 	FString Name = Character->GetCharacterName();
 	if (Name2IDMap.Contains(Name))
@@ -63,8 +62,13 @@ FString UCharacterManagerSubsystem::GenerateID(AGeneralCharacter *Character)
 	}
 	Name2IDMap.Add(Name,ID);
 	Tag2IDMap.Add(Character->GetCharacterTag(),ID);
-	
-	return ID;
+}
+
+void UCharacterManagerSubsystem::UnRegister(AGeneralCharacter* Character)
+{
+	ID2CharcCharacterMap.Remove(Character->GetCharacterID());
+	Name2IDMap.Remove(Character->GetCharacterName());
+	Tag2IDMap.Remove(Character->GetCharacterTag());
 }
 
 AGeneralCharacter* UCharacterManagerSubsystem::GetCharacterByTag(const FGameplayTag& CharacterTag) const

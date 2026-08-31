@@ -35,6 +35,7 @@ UGeneralItemInstance* UGeneralItemInstance::GeneralItemInstanceFactory(const FDa
 		FString::Printf(TEXT("GetRow failed, DB:%s Row:%s"),*DataSource.DataTable.GetPathName(),*DataSource.RowName.ToString()));
 	ASSERT_STATIC(ItemInfo->StaticStruct() == FS_GeneralItemInfo::StaticStruct(),UGeneralItemInstance::StaticClass()->GetName());
 	auto ItemInstance = NewObject<UGeneralItemInstance>();
+	ItemInstance->DataTableRow = DataSource;
 	ItemInstance->Initialize(ItemInfo);
 	return ItemInstance;
 }

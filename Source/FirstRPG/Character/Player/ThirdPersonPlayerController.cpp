@@ -1,12 +1,101 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "ThirdPersonPlayerController.h"
+#include "FirstRPG/SaveSystem/SaveData.h"
+#include "FirstRPG/Character/GeneralCharacter.h"
+#include "FirstRPG/Component/EquipmentComponent.h"
 #include "FirstRPG/Debug/Debug.h"
+#include "FirstRPG/Item/Equipment/MeleeWeapon.h"
+#include "FirstRPG/Item/Equipment/RangeWeapon.h"
+#include "FirstRPG/Item/Equipment/Shield.h"
 
 void AThirdPersonPlayerController::QuestFinished_Implementation(const FGameplayTag& QuestTag)
 {
 	ActiveQuests[QuestTag].IsFinished = true;
 	FocusedQuest = FGameplayTag::EmptyTag;
 	ActiveQuests.Remove(QuestTag);
+}
+
+void AThirdPersonPlayerController::SavePlayerData_Implementation(FPlayerSaveData& Data)
+{
+	auto PlayerCharacter = Cast<AGeneralCharacter>(this->GetPawn());
+	if (!PlayerCharacter)
+	{
+		CPP_LOG(Error,"Cannot save player data,Get Player Character failed.");
+		return;
+	}
+	auto EquipmentCmp = PlayerCharacter->FindComponentByClass<UEquipmentComponent>();
+	if (!EquipmentCmp)
+	{
+		CPP_LOG(Error,"Cannot save player data,Get Equipment Component failed.");
+		return;
+	}
+	//保存背包内所有物品
+	auto EquipmentInsts = EquipmentCmp->GetEquippableItems();
+	TArray<FBagItemData> EquipmentSaveDataArray;
+	FBagItemData EquipmentData;
+	for (auto elem:EquipmentInsts)
+	{
+		EquipmentData.ItemClass = elem->GetBPClassToSpawn();
+		EquipmentData.ItemInfoRowHandler = elem->GetDataTableRow();
+		EquipmentSaveDataArray.Add(EquipmentData);
+	}
+	Data.Equipments = EquipmentSaveDataArray;
+	//保存现在的装备
+	auto EStatus = EquipmentCmp->GetCurEquipmentStatus();
+	if (EStatus.MeleeWeapon)
+		Data.EquipStatus.MeleeWeapon = EStatus.MeleeWeapon->GetItemInstance()->GetDataTableRow();
+	if (EStatus.RangeWeapon)
+		Data.EquipStatus.RangeWeapon = EStatus.RangeWeapon->GetItemInstance()->GetDataTableRow();
+	if (EStatus.Armor)
+		Data.EquipStatus.Armor = EStatus.Armor->GetItemInstance()->GetDataTableRow();
+	if (EStatus.Shield)
+		Data.EquipStatus.Shield = EStatus.Shield->GetItemInstance()->GetDataTableRow();
+	//剩下的保存交给蓝图处理
+}
+
+void AThirdPersonPlayerController::LoadPlayerData_Implementation(const FPlayerSaveData& Data)
+{
+	auto PlayerCharacter = Cast<AGeneralCharacter>(this->GetPawn());
+	if (!PlayerCharacter)
+	{
+		CPP_LOG(Error,"Cannot save player data,Get Player Character failed.");
+		return;
+	}
+	auto EquipmentCmp = PlayerCharacter->FindComponentByClass<UEquipmentComponent>();
+	EquipmentCmp->ClearBag();
+	if (!EquipmentCmp)
+	{
+		CPP_LOG(Error,"Cannot save player data,Get Equipment Component failed.");
+		return;
+	}
+	auto EStatus = Data.EquipStatus;
+	//载入背包物品
+	for (auto elem:Data.Equipments)
+	{
+		if (elem.ItemClass->IsChildOf(AEquippableItemActor::StaticClass()))
+		{
+			auto EquipmentInst = UEquipmentInstance::EquipmentInstanceFactory(elem.ItemInfoRowHandler);
+			EquipmentCmp->AddEquippableItem(EquipmentInst);
+			//恢复玩家装备状态
+			if (!EStatus.MeleeWeapon.IsNull() && elem.ItemInfoRowHandler == EStatus.MeleeWeapon)
+			{
+				EquipmentCmp->SetEquippedMeleeWeapon(EquipmentInst);
+			}
+			if (!EStatus.RangeWeapon.IsNull() && elem.ItemInfoRowHandler == EStatus.RangeWeapon)
+			{
+				EquipmentCmp->SetEquippedRangeWeapon(EquipmentInst);
+			}
+			if (!EStatus.Armor.IsNull() && elem.ItemInfoRowHandler == EStatus.Armor)
+			{
+				EquipmentCmp->SetEquippedArmor(EquipmentInst);
+			}
+			if (!EStatus.Shield.IsNull() && elem.ItemInfoRowHandler == EStatus.Shield)
+			{
+				EquipmentCmp->SetEquippedShield(EquipmentInst);
+			}
+		}
+	}
+	
 }
 
 void AThirdPersonPlayerController::BeginPlay()

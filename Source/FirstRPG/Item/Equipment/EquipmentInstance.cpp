@@ -24,6 +24,7 @@ UEquipmentInstance* UEquipmentInstance::EquipmentInstanceFactory(const FDataTabl
 		FString::Printf(TEXT("GetRow failed, DB:%s Row:%s"),*DataSource.DataTable.GetPathName(),*DataSource.RowName.ToString()));
 	ASSERT_STATIC(ItemInfo->StaticStruct() == FS_EquippableItemInfo::StaticStruct(),UEquipmentInstance::StaticClass()->GetName());
 	auto EquipmentInstance = NewObject<UEquipmentInstance>();
+	EquipmentInstance->DataTableRow = DataSource;
 	EquipmentInstance->Initialize(ItemInfo);
 	return EquipmentInstance;
 }
