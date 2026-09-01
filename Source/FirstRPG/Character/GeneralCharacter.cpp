@@ -112,6 +112,7 @@ void AGeneralCharacter::SaveCharacterData_Implementation(FCharacterSaveData& Dat
 	if (!EquipmentCmp)
 	{
 		CPP_LOG(Error, TEXT("Equipment component not found"));
+		return;
 	}
 	auto EStatus = EquipmentCmp->GetCurEquipmentStatus();
 	if (EStatus.MeleeWeapon) Data.EquipStatus.MeleeWeapon = EStatus.MeleeWeapon->GetItemInfoHandle();
@@ -128,6 +129,7 @@ void AGeneralCharacter::LoadCharacterData_Implementation(const FCharacterSaveDat
 	if (!EquipmentCmp)
 	{
 		CPP_LOG(Error, TEXT("Equipment component not found"));
+		return;
 	}
 	if (!Data.EquipStatus.MeleeWeapon.IsNull())
 	{
@@ -139,7 +141,7 @@ void AGeneralCharacter::LoadCharacterData_Implementation(const FCharacterSaveDat
 	{
 		auto RangeInst = UEquipmentInstance::EquipmentInstanceFactory(Data.EquipStatus.RangeWeapon);
 		EquipmentCmp->AddEquippableItem(RangeInst);
-		EquipmentCmp->SetEquippedMeleeWeapon(RangeInst);
+		EquipmentCmp->SetEquippedRangeWeapon(RangeInst);
 	}
 	if (!Data.EquipStatus.Armor.IsNull())
 	{
@@ -151,7 +153,7 @@ void AGeneralCharacter::LoadCharacterData_Implementation(const FCharacterSaveDat
 	{
 		auto ShieldInst = UEquipmentInstance::EquipmentInstanceFactory(Data.EquipStatus.Shield);
 		EquipmentCmp->AddEquippableItem(ShieldInst);
-		EquipmentCmp->SetEquippedMeleeWeapon(ShieldInst);
+		EquipmentCmp->SetEquippedShield(ShieldInst);
 	}
 	IsStatic = Data.IsStatic;
 }

@@ -58,16 +58,16 @@ void AThirdPersonPlayerController::LoadPlayerData_Implementation(const FPlayerSa
 	auto PlayerCharacter = Cast<AGeneralCharacter>(this->GetPawn());
 	if (!PlayerCharacter)
 	{
-		CPP_LOG(Error,"Cannot save player data,Get Player Character failed.");
+		CPP_LOG(Error,"Cannot load player data,Get Player Character failed.");
 		return;
 	}
 	auto EquipmentCmp = PlayerCharacter->FindComponentByClass<UEquipmentComponent>();
-	EquipmentCmp->ClearBag();
 	if (!EquipmentCmp)
 	{
-		CPP_LOG(Error,"Cannot save player data,Get Equipment Component failed.");
+		CPP_LOG(Error,"Cannot load player data,Get Equipment Component failed.");
 		return;
 	}
+	EquipmentCmp->ClearBag();
 	auto EStatus = Data.EquipStatus;
 	//载入背包物品
 	for (auto elem:Data.Equipments)

@@ -42,6 +42,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FString GetCharacterID() const{return CharacterID;}
+	UFUNCTION(BlueprintCallable,Category = "Character")
+	inline void SetCharacterName(FString Name){this->CharacterName = Name;}
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")
 	inline FString GetCharacterName() const{ return CharacterName; }
 	UFUNCTION(BlueprintCallable, BlueprintPure,Category = "Character")

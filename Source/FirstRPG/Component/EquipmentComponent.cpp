@@ -252,8 +252,11 @@ void UEquipmentComponent::RemoveShield()
 {
 	if (GetOwner()->ActorHasTag("Player"))
 		CaptureComponent->ShowOnlyActors.Remove(CurEquipmentRef.Shield);
-	CurEquipmentRef.Shield->Destroy(true);
-	CurEquipmentRef.Shield = nullptr;
+	if (CurEquipmentRef.Shield)
+	{
+		CurEquipmentRef.Shield->Destroy(true);
+		CurEquipmentRef.Shield = nullptr;
+	}
 }
 
 
@@ -273,7 +276,7 @@ bool UEquipmentComponent::SetEquippedArmor(UEquipmentInstance* Instance)
 	
 	if (CurEquipmentRef.Armor)
 	{
-		RemoveShield();
+		RemoveArmor();
 	}
 	//对于盔甲一般是骨骼网格体
 	if (Instance->GetSkMesh())
@@ -379,6 +382,7 @@ bool UEquipmentComponent::ChangeUsingWeapon(UEquipmentInstance* Instance)
 	case E_EquipmentCategory::RangeWeapon:
 		{
 			RemoveRangeWeapon();
+			SheatheShield();
 			CurEquipmentRef.RangeWeapon = SpawnAtArmedSocket<AStRangeWeapon>(Instance, OwnerMesh);
 			UsingWeapon = CurEquipmentRef.RangeWeapon;
 			return true;

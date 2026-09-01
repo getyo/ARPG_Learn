@@ -121,39 +121,6 @@ TMap<FString,UEquipmentInstance*> EquipmentName2Obj;
 
 所以说，不可堆叠Item在Map里面保存了哪个不重要，只要背包检测到这个对象不可堆叠，他就会乖乖去遍历整个数组。
 
+## 四、关于存档（简要）
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+GeneralItemActor实现了存档接口IItemSaveInterface（SaveItemData/LoadItemData），世界中存在的道具会在BeginPlay时自动注册到USaveLoadSystem，被拾取/销毁后自动注销；存档时记录位置、数据表行、类与Dead/IsStatic标记，读档时根据标记决定是否重生。具体设计见**存档系统.md**。

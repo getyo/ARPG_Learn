@@ -53,12 +53,13 @@ void UCharacterManagerSubsystem::Register(AGeneralCharacter* Character)
 	FString ID = Character->GetCharacterID();
 	ID2CharcCharacterMap.Add(ID,Character);
 	FString Name = Character->GetCharacterName();
-	if (Name2IDMap.Contains(Name))
+	while (Name2IDMap.Contains(Name))
 	{
 		//生成一个不重复的名字
 		//规则是：如果名字的结束不是以数字结尾，则加一个_1，
 		//如果是，则递增数字。
 		Name = IncrementSuffix(Name);
+		Character->SetCharacterName(Name);
 	}
 	Name2IDMap.Add(Name,ID);
 	Tag2IDMap.Add(Character->GetCharacterTag(),ID);
