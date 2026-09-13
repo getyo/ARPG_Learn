@@ -1,0 +1,102 @@
+# =========================================================================
+# 本仓库只入库：代码 / 项目配置 / 我自己做的资产（蓝图·动画·状态机·关卡·UI·数据）
+# 规则：先全部忽略，再逐目录放行（白名单）。第三方、模板、素材、引擎生成物一律不入。
+# 新增自己做目录时，记得在下面补一条 !/Content/你的目录/
+# =========================================================================
+
+# ---------- 白名单：根级 ----------
+/*
+!/.gitignore
+!/.editorconfig
+!/.vsconfig
+!/README.md
+!/FirstRPG.uproject
+!/Config/
+!/Source/
+!/Document/
+!/Plugins/
+
+# ---------- 白名单：Content ----------
+!/Content/
+/Content/*
+!/Content/Levels/
+!/Content/Player/
+!/Content/NPC/
+!/Content/QusetionSystem/
+!/Content/EquipmentSystem/
+!/Content/Item/
+!/Content/Component/
+!/Content/MountSystem/
+!/Content/Dialogue/
+!/Content/Interfaces/
+!/Content/UI/
+# UI：只留自己做的那两个子目录，字体不入
+/Content/UI/Font/
+# 宝箱：只要蓝图（我编辑过的），别人的模型/材质/贴图不入
+!/Content/WorldEntity/
+/Content/WorldEntity/Asset/
+# RPG 角色包：只要动画与状态机，模型/材质/贴图/音效不入
+!/Content/Characters/
+/Content/Characters/*
+!/Content/Characters/RPG_Character/
+/Content/Characters/RPG_Character/*
+!/Content/Characters/RPG_Character/Animation/
+
+# ---------- 第三方 / 模板 / UE 外部数据（整体不入）----------
+/Content/Fab/
+/Content/StarterContent/
+/Content/LevelPrototyping/
+/Content/Collections/
+/Content/Developers/
+/Content/__ExternalActors__/
+/Content/__ExternalObjects__/
+*_BuiltData.uasset
+
+# ---------- 引擎生成物 / 编辑器产物 ----------
+/Binaries/
+/Intermediate/
+/Saved/
+/DerivedDataCache/
+/.vs/
+/.idea/
+*.sln
+*.slnx
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.VC.db
+
+# ---------- 编译产物 ----------
+*.dll
+*.lib
+*.exe
+*.pdb
+*.obj
+*.o
+
+# ---------- 插件：只留源码与描述，不留编译产物 ----------
+/Plugins/*/Binaries/
+/Plugins/*/Intermediate/
+
+# ---------- 原始素材（散落在白名单目录里的也不入）----------
+*.fbx
+*.psd
+*.tga
+*.wav
+*.mp3
+*.mp4
+*.mov
+*.blend
+*.max
+*.ztl
+*.spp
+
+# ---------- 同步/临时文件 ----------
+*baiduyun*
+*.baiduyun.*
+*.tmp
+*.bak
+Thumbs.db
+.DS_Store
