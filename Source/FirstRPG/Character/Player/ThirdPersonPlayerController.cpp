@@ -3,6 +3,7 @@
 #include "FirstRPG/SaveSystem/SaveData.h"
 #include "FirstRPG/Character/GeneralCharacter.h"
 #include "FirstRPG/Component/EquipmentComponent.h"
+#include "FirstRPG/Component/CharacterStatusComponent.h"
 #include "FirstRPG/Debug/Debug.h"
 #include "FirstRPG/Item/Equipment/MeleeWeapon.h"
 #include "FirstRPG/Item/Equipment/RangeWeapon.h"
@@ -50,6 +51,16 @@ void AThirdPersonPlayerController::SavePlayerData_Implementation(FPlayerSaveData
 		Data.EquipStatus.Armor = EStatus.Armor->GetItemInstance()->GetDataTableRow();
 	if (EStatus.Shield)
 		Data.EquipStatus.Shield = EStatus.Shield->GetItemInstance()->GetDataTableRow();
+	// ===== 玩家状态（由 C++ 状态组件提供）=====
+	if (auto* StatusCmp = PlayerCharacter->FindComponentByClass<UCharacterStatusComponent>())
+	{
+		Data.Health = StatusCmp->CurHealth;
+		Data.MaxHealth = StatusCmp->MaxHealth;
+		Data.MaxStamina = StatusCmp->MaxStamina;
+		Data.Level = StatusCmp->Level;
+		Data.CanBeKilled = StatusCmp->CanBeKilled;
+	}
+
 	// ===== 任务系统存档 =====
 	Data.QuestData.ActiveQuests = ActiveQuests;
 	Data.QuestData.FocusedQuest = FocusedQuest;
@@ -124,6 +135,22 @@ void AThirdPersonPlayerController::LoadPlayerData_Implementation(const FPlayerSa
 			{
 				EquipmentCmp->SetEquippedShield(EquipmentInst);
 			}
+		}
+	}
+
+	// ===== 玩家状态读档（由 C++ 状态组件接管）=====
+	if (auto* StatusOwnerChar = Cast<AGeneralCharacter>(this->GetPawn()))
+	{
+		if (auto* StatusCmp = StatusOwnerChar->FindComponentByClass<UCharacterStatusComponent>())
+		{
+			StatusCmp->MaxHealth = Data.MaxHealth;
+			StatusCmp->MaxStamina = Data.MaxStamina;
+			StatusCmp->Level = Data.Level;
+			StatusCmp->CanBeKilled = Data.CanBeKilled;
+			StatusCmp->CurHealth = FMath::Clamp(Data.Health, 0.f, Data.MaxHealth);
+			StatusCmp->CurStamina = StatusCmp->MaxStamina;
+			StatusCmp->IsDead = StatusCmp->CurHealth <= 0.f;
+			StatusCmp->BroadcastStatusValues();
 		}
 	}
 

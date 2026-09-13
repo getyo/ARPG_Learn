@@ -2,6 +2,7 @@
 
 
 #include "GeneralCharacter.h"
+#include "FirstRPG/Component/CharacterStatusComponent.h"
 #include "CharacterManagerSubsystem.h"
 #include "FirstRPG/Debug/Debug.h"
 #include "FirstRPG/Item/Equipment/MeleeWeapon.h"
@@ -127,6 +128,16 @@ void AGeneralCharacter::SaveCharacterData_Implementation(FCharacterSaveData& Dat
 		if (EStatus.Shield) Data.EquipStatus.Shield = EStatus.Shield->GetItemInfoHandle();
 		if (EStatus.Armor) Data.EquipStatus.Armor = EStatus.Armor->GetItemInfoHandle();
 	}
+	// 状态数据（生命/耐力/等级）由 C++ 状态组件提供
+	if (auto* StatusCmp = FindComponentByClass<UCharacterStatusComponent>())
+	{
+		Data.Health = StatusCmp->CurHealth;
+		Data.MaxHealth = StatusCmp->MaxHealth;
+		Data.MaxStamina = StatusCmp->MaxStamina;
+		Data.Level = StatusCmp->Level;
+		Data.CanBeKilled = StatusCmp->CanBeKilled;
+	}
+	Data.Faction = CharacterFaction;
 	Data.IsStatic = IsStatic;
 	Data.Name = CharacterName;
 	// 世界信息对齐 AGeneralItemActor::SaveItemData（不然重建时 class 为空、位置落在 0,0,0）
@@ -139,7 +150,21 @@ void AGeneralCharacter::SaveCharacterData_Implementation(FCharacterSaveData& Dat
 
 void AGeneralCharacter::LoadCharacterData_Implementation(const FCharacterSaveData& Data)
 {
-	// 没有装备组件（马/动物等）就跳过装备恢复；不再报 Error 刷屏
+	// 状态恢复（没有装备组件的角色也要执行）
+	if (auto* StatusCmp = FindComponentByClass<UCharacterStatusComponent>())
+	{
+		StatusCmp->MaxHealth = Data.MaxHealth;
+		StatusCmp->MaxStamina = Data.MaxStamina;
+		StatusCmp->Level = Data.Level;
+		StatusCmp->CanBeKilled = Data.CanBeKilled;
+		StatusCmp->CurHealth = FMath::Clamp(Data.Health, 0.f, Data.MaxHealth);
+		StatusCmp->CurStamina = StatusCmp->MaxStamina;
+		StatusCmp->IsDead = StatusCmp->CurHealth <= 0.f;
+		StatusCmp->BroadcastStatusValues();
+	}
+	CharacterFaction = Data.Faction;
+
+	// 装备：组件是可选的（马/动物等没有就跳过）
 	auto EquipmentCmp = FindComponentByClass<UEquipmentComponent>();
 	if (!EquipmentCmp)
 	{
